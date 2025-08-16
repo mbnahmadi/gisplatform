@@ -1,1 +1,1 @@
-from .user_models import CustomUserModel
+from .user_models import *
