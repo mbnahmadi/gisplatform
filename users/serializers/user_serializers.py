@@ -1,5 +1,6 @@
 import re
 from django.core.exceptions import ValidationError
+from core.verify_email import verify_user_email
 from rest_framework import serializers
 from users.models import CustomUserModel
 from django.contrib.auth.password_validation import validate_password
@@ -18,7 +19,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
 
     class Meta:
-        models = User
+        model = User
         fields = ['username', 'email', 'password', 'confirm_password']
 
     def validate_password(self, value):
@@ -63,31 +64,27 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
 class VerifyEmailSerializer(serializers.ModelSerializer):
     email = serializers.EmailField()
-    code = serializers.CharField()
+    email_code = serializers.CharField()
 
     def validate(self, attrs):
         try:
-            user = User.objects.get(mobile=attrs['email'])
+            user = User.objects.get(email=attrs['email'])
         except User.DoesNotExist:
             raise serializers.ValidationError("User not found.")
 
         try:
-            code = verify_user_otp(user, attrs['code'], 'verify_email')
+            code = verify_user_email(user, attrs['email_code'], 'verify_email')
         except ValidationError as e:
             raise serializers.ValidationError(str(e))
 
         self.user = user
-        self.otp = otp
+        self.code = code
         return attrs
-
 
     def save(self):
         self.code.is_used = True
         self.code.save(update_fields=['is_used'])
-        self.user.is_mobile_verified = True
+        self.user.is_email_verified = True
         self.user.is_active = True
-        self.user.save(update_fields=['is_mobile_verified', 'is_active'])
+        self.user.save(update_fields=['is_active', 'is_email_verified'])
         return self.user
-
-
-        

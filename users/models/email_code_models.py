@@ -6,13 +6,13 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.utils.translation import gettext_lazy as _
 
 
-class EmialCodeModel(models.Model):
+class EmailCodeModel(models.Model):
     PURPOSE_CHOICES = (
         ('verify_email', 'Verify Email'),
     )
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_('User'))
-    code = models.CharField(verbose_name=_('Code'))
+    code = models.CharField(verbose_name=_('Code'), max_length=128)
     is_used = models.BooleanField(default=False, verbose_name=_('is_used'))
     purpose = models.CharField(max_length=20, choices=PURPOSE_CHOICES, verbose_name=_('purpose'))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Created At'))
