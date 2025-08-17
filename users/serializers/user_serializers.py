@@ -1,7 +1,13 @@
 import re
+from django.core.exceptions import ValidationError
 from rest_framework import serializers
 from users.models import CustomUserModel
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
+
 
 class RegisterUserSerializer(serializers.ModelSerializer):
     '''
@@ -12,7 +18,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
 
     class Meta:
-        models = CustomUserModel
+        models = User
         fields = ['username', 'email', 'password', 'confirm_password']
 
     def validate_password(self, value):
@@ -25,13 +31,13 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         if not re.match(r'^[a-z0-9_]+$', value):
             raise serializers.ValidationError('Username must contain only English letters, numbers or underscore.')
 
-        if CustomUserModel.objects.filter(username=value).exists():
+        if User.objects.filter(username=value).exists():
             raise serializers.ValidationError('This username already exists.')
         return value
     
     def validate_email(self, value):
         value = value.lower().strip()
-        if CustomUserModel.objects.filter(email=value).exists():
+        if User.objects.filter(email=value).exists():
             raise serializers.ValidationError('This email already exists.')
         return value
     
@@ -44,7 +50,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         password = validated_data.pop('password')
         validated_data.pop('confirm_password')
 
-        user = CustomUserModel.objects.create_user(
+        user = User.objects.create_user(
             **validated_data,
             password=password,
             is_active = False,
@@ -53,3 +59,35 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             )
         
         return user
+
+
+class VerifyEmailSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField()
+    code = serializers.CharField()
+
+    def validate(self, attrs):
+        try:
+            user = User.objects.get(mobile=attrs['email'])
+        except User.DoesNotExist:
+            raise serializers.ValidationError("User not found.")
+
+        try:
+            code = verify_user_otp(user, attrs['code'], 'verify_email')
+        except ValidationError as e:
+            raise serializers.ValidationError(str(e))
+
+        self.user = user
+        self.otp = otp
+        return attrs
+
+
+    def save(self):
+        self.code.is_used = True
+        self.code.save(update_fields=['is_used'])
+        self.user.is_mobile_verified = True
+        self.user.is_active = True
+        self.user.save(update_fields=['is_mobile_verified', 'is_active'])
+        return self.user
+
+
+        

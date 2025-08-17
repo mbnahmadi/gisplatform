@@ -47,6 +47,9 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'users.CustomUserModel'
+EMAIL_CODE_VERIFICATION_EXPIRE_SECONDS = 300 # expire after 5 minute
+CODE_RESEND_INTERVAL_SECONDS = 120 # حداقل فاصله بین ارسال های مجدد کد (rate limit)
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
