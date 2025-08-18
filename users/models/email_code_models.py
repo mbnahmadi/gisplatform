@@ -16,7 +16,7 @@ class EmailCodeModel(models.Model):
     is_used = models.BooleanField(default=False, verbose_name=_('is_used'))
     purpose = models.CharField(max_length=20, choices=PURPOSE_CHOICES, verbose_name=_('purpose'))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('Created At'))
-    attempts = models.IntegerField(default=0, verbose_name=_('attempts')) # تعداد تلاش ها اگر بیشتر از 3 بار اشتباه وارد بشه دباره باید درخواست بده
+    attempts = models.IntegerField(default=0, null=False, verbose_name=_('attempts')) # تعداد تلاش ها اگر بیشتر از 3 بار اشتباه وارد بشه دباره باید درخواست بده
 
     def save(self, *args, **kwargs):
         if not self.pk: # برای اولین بار فقط هش کن

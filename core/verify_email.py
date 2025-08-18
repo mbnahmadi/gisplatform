@@ -30,14 +30,19 @@ def verify_user_email(user, code, purpose):
 
         # افزایش تعداد تلاش (atomic چون داخل تراکنش است)
         # با استفاده از F این افزایش مستقیم روی این فیلد اتفاق میوفته نه توی پایتون
-        raw_code.attempts = F('attempts') + 1
-        raw_code.save(update_fields=['attempts'])
+        # raw_code.attempts = F('attempts') + 1
+        # raw_code.save(update_fields=['attempts'])
+
+        EmailCodeModel.objects.filter(pk=raw_code.pk).update(attempts=F('attempts') + 1)
+        raw_code.refresh_from_db(fields=['attempts'])
+
         # refresh از DB تا مقدار واقعی attempts را داشته باشیم
-        raw_code.refresh_from_db()
+        raw_code.refresh_from_db(fields=['attempts'])
+        # raw_code = EmailCodeModel.objects.get(pk=raw_code.pk)
 
         # اگر از حد مجاز بیشتر شده باشد
-        max_attempts = getattr(settings, 'OTP_MAX_ATTEMPTS')
-        #getattr(settings, 'OTP_MAX_ATTEMPTS', 3) # از ستینگ بیا OTP_MAX_ATTEMPTS رو بگیر اگه نداشت 3 بذار
+        max_attempts = getattr(settings, 'VERIFY_EMAIL_CODE_MAX_ATTEMPTS')
+        #getattr(settings, 'VERIFY_EMAIL_CODE_MAX_ATTEMPTS', 3) # از ستینگ بیا VERIFY_EMAIL_CODE_MAX_ATTEMPTS رو بگیر اگه نداشت 3 بذار
         if raw_code.attempts > max_attempts:
             raise ValidationError("Too many attempts. Please request a new code.")
 
