@@ -13,7 +13,9 @@ def send_code_to_email(user, purpose):
     '''
     #  بررسی آخرین زمان ارسال
     # کاربر هر 2 دقیقه یکبار میتونه درخواست بده
-    last_code = EmailCodeModel.objects.filter(user=user, purpose=purpose).order('-created_at').first()
+    # CODE_RESEND_INTERVAL_SECONDS همین باعث میشه کد را هر 2 دقیقه یکبار بتونه درخواست بده
+    last_code = EmailCodeModel.objects.filter(user=user, purpose=purpose).order_by('-created_at').first()
+    print('last_code', last_code)
     if last_code and last_code.created_at > timezone.now() - timedelta(seconds=settings.CODE_RESEND_INTERVAL_SECONDS):
         raise ValidationError("Please wait before requesting another code to send.")
 

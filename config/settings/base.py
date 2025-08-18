@@ -51,6 +51,22 @@ EMAIL_CODE_VERIFICATION_EXPIRE_SECONDS = 300 # expire after 5 minute
 CODE_RESEND_INTERVAL_SECONDS = 120 # حداقل فاصله بین ارسال های مجدد کد (rate limit)
 OTP_MAX_ATTEMPTS = 3 # تعداد تلاش اشتباه وارد کردن کد 
 
+REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.ScopedRateThrottle', # برای هر ویو یک scope تعریف کنی
+        # اگه تغریف نشه عملا هر چی توی DEFAULT_THROTTLE_RATES نوشتیم کار نمیکنه
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '10/minute',     
+        'user': '100/hour',
+        'email_register': '2/minute',
+        'email_verify': '5/minute',
+    }
+   
+}
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -127,6 +143,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

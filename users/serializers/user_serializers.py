@@ -62,7 +62,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         return user
 
 
-class VerifyEmailSerializer(serializers.ModelSerializer):
+class VerifyEmailSerializer(serializers.Serializer):
     email = serializers.EmailField()
     email_code = serializers.CharField()
 

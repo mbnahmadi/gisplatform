@@ -20,34 +20,34 @@ def verify_user_email(user, code, purpose):
             is_used=False
         ).order_by('-created_at')
 
-        code = code_qs.first()
-        if not code:
+        raw_code = code_qs.first() # اخرین کوئری بدست امده
+        if not raw_code:
             raise ValidationError("Invalid code or no code found.")
 
         # بررسی انقضا
-        if code.is_expired():
+        if raw_code.is_expired():
             raise ValidationError("Code expired.")
 
         # افزایش تعداد تلاش (atomic چون داخل تراکنش است)
         # با استفاده از F این افزایش مستقیم روی این فیلد اتفاق میوفته نه توی پایتون
-        code.attempts = F('attempts') + 1
-        code.save(update_fields=['attempts'])
+        raw_code.attempts = F('attempts') + 1
+        raw_code.save(update_fields=['attempts'])
         # refresh از DB تا مقدار واقعی attempts را داشته باشیم
-        code.refresh_from_db()
+        raw_code.refresh_from_db()
 
         # اگر از حد مجاز بیشتر شده باشد
         max_attempts = getattr(settings, 'OTP_MAX_ATTEMPTS')
         #getattr(settings, 'OTP_MAX_ATTEMPTS', 3) # از ستینگ بیا OTP_MAX_ATTEMPTS رو بگیر اگه نداشت 3 بذار
-        if code.attempts > max_attempts:
+        if raw_code.attempts > max_attempts:
             raise ValidationError("Too many attempts. Please request a new code.")
 
         # بررسی کد
-        if not code.check_code(code):
+        if not raw_code.check_code(code):
             # کد اشتباه است ولی چون attempts افزایش یافته، تا رسیدن به حداکثر ادامه می‌یابد
             raise ValidationError("Invalid code.")
 
         
-        code.is_used = True
-        code.save(update_fields=['is_used'])  #update_fields فقط همین فیلد اپدیت میشه نه کل فیلد ها
+        raw_code.is_used = True
+        raw_code.save(update_fields=['is_used'])  #update_fields فقط همین فیلد اپدیت میشه نه کل فیلد ها
 
-        return code
+        return raw_code

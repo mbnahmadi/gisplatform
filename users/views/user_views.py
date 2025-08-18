@@ -1,17 +1,21 @@
+from django.forms import ValidationError
 from users.models import CustomUserModel
-from core.send_verification_code import send_code_to_email
-from users.serializers import RegisterUserSerializer, VerifyEmailSerializer
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
 from django.contrib.auth import get_user_model
+from rest_framework.throttling import ScopedRateThrottle
 from drf_yasg.utils import swagger_auto_schema
+from core.send_verification_code import send_code_to_email
+from users.serializers import RegisterUserSerializer, VerifyEmailSerializer
 
 User = get_user_model()
 
 
 class RegisterUserView(APIView):
     # permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'email_register'
     @swagger_auto_schema(request_body=RegisterUserSerializer)
 
     def post(self, request):
@@ -28,6 +32,8 @@ class RegisterUserView(APIView):
 
 class VerifyEmailView(APIView):
     # permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'email_verify'
     @swagger_auto_schema(request_body=VerifyEmailSerializer)
 
     def post(self, request):
