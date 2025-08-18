@@ -88,3 +88,21 @@ class VerifyEmailSerializer(serializers.Serializer):
         self.user.is_active = True
         self.user.save(update_fields=['is_active', 'is_email_verified'])
         return self.user
+
+
+
+class ResendVerificationCodeSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        try:
+            user = User.objects.get(email=email) # کوئری مربوط به اون یوزر رو میده
+        except User.DoesNotExist:
+            raise serializers.ValidationError('User with this email not found.')
+
+        if user.is_email_verified:
+            raise serializers.ValidationError('This email has already been verified.')
+
+        attrs["user"] = user # # برمی‌گردونیم برای استفاده در view
+        return attrs

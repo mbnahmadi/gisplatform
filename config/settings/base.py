@@ -63,6 +63,7 @@ REST_FRAMEWORK = {
         'user': '100/hour',
         'email_register': '2/minute',
         'email_verify': '5/minute',
+        "resend_verification_code": "3/hour",
     }
    
 }

@@ -17,9 +17,11 @@ Including another URLconf
 from django.urls import path
 from users.views import (
     RegisterUserView,
-    VerifyEmailView
+    VerifyEmailView,
+    ResendVerificationCodeView
 )
 urlpatterns = [
     path('register/', RegisterUserView.as_view(), name='register'),
     path('verify-email/', VerifyEmailView.as_view(), name='verify-email'),
+    path('resend-verification-code/', ResendVerificationCodeView.as_view(), name='resend-verification-code'),
 ]
