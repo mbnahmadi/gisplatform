@@ -67,6 +67,12 @@ REST_FRAMEWORK = {
     }
    
 }
+# ---------- backends authentication ---------------
+AUTHENTICATION_BACKENDS = [
+    'users.backends.MultiFieldModelBackend',  # اولویت اول
+    'django.contrib.auth.backends.ModelBackend',  # در صورت نیاز
+]
+# ----------------------------------------------------
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
