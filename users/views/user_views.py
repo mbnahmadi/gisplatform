@@ -1,5 +1,6 @@
 from django.forms import ValidationError
 from users.models import CustomUserModel
+from django.db import transaction
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -15,7 +16,7 @@ User = get_user_model()
 class RegisterUserView(APIView):
     # permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
-    throttle_scope = 'email_register'
+    # throttle_scope = 'email_register'
     @swagger_auto_schema(request_body=RegisterUserSerializer)
 
     def post(self, request):
@@ -33,7 +34,7 @@ class RegisterUserView(APIView):
 class VerifyEmailView(APIView):
     # permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
-    throttle_scope = 'email_verify'
+    # throttle_scope = 'email_verify'
     @swagger_auto_schema(request_body=VerifyEmailSerializer)
 
     def post(self, request):
@@ -46,7 +47,7 @@ class VerifyEmailView(APIView):
 
 class ResendVerificationCodeView(APIView):
     throttle_classes = [ScopedRateThrottle]
-    throttle_scope = 'resend_verification_code'
+    # throttle_scope = 'resend_verification_code'
     @swagger_auto_schema(request_body=ResendVerificationCodeSerializer)
 
     def post(self, request):
