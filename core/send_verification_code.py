@@ -1,5 +1,6 @@
 import random
 from users.models.email_code_models import EmailCodeModel
+from users.models.two_FA_models import TwoFAModels
 # from users.models.
 from rest_framework.exceptions import ValidationError
 from django.core.mail import send_mail
@@ -40,4 +41,11 @@ def send_otp_code(user, purpose):
     '''
     فقط کد ارسال میکنه برای تایید موبایل و همچنین لاگین برای احراز هویت دو مرحله ای
     '''
-    pass
+    last_code = TwoFAModels.objects.filter(user=user, purpose=purpose).order_by('-created_at').first()
+    if last_code and last_code.created_at > timezone.now() - timedelta(seconds=settings.CODE_RESEND_INTERVAL_SECONDS):
+        raise ValidationError('Please wait before requesting another code to send.')
+
+    raw_code = str(random.randint(100000, 99999))
+    TwoFAModels.objects.create(user=user, code=raw_code, purpose=purpose)
+
+    print(f'[Debug] OTP send to {user.mobile}: {raw_code}')

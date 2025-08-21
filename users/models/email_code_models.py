@@ -29,7 +29,7 @@ class EmailCodeModel(models.Model):
 
     
     def is_expired(self):
-        expiry_time = self.created_at + timedelta(seconds=settings.EMAIL_CODE_VERIFICATION_EXPIRE_SECONDS)
+        expiry_time = self.created_at + timedelta(seconds=settings.VERIFICATION_CODE_EXPIRE_SECONDS)
         return timezone.now() > expiry_time # expires after 5 min
 
 
