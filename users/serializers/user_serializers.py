@@ -1,6 +1,6 @@
 import re
 from django.core.exceptions import ValidationError
-from core.verify_email import verify_user_email
+from core.verify_code import verify_user_email_code
 from rest_framework import serializers
 from users.models import CustomUserModel
 from django.contrib.auth.password_validation import validate_password
@@ -73,7 +73,7 @@ class VerifyEmailSerializer(serializers.Serializer):
             raise serializers.ValidationError("User not found.")
 
         try:
-            code = verify_user_email(user, attrs['email_code'], 'verify_email')
+            code = verify_user_email_code(user, attrs['email_code'], 'verify_email')
         except ValidationError as e:
             raise serializers.ValidationError(str(e))
 
