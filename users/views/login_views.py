@@ -1,15 +1,18 @@
 from django.core.serializers import serialize
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
-from serializers.login_serializers import LoginSerializer, VerifyOTPCode2FSerializer
+from users.serializers.login_serializers import LoginSerializer, VerifyOTPCode2FSerializer
 from core.send_verification_code import send_otp_code
 # from core.verify_code import verify_user_mobile_2FA_code
 from django.contrib.auth.models import update_last_login
 from drf_yasg.utils import swagger_auto_schema
 
 class LoginView(APIView):
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scoped = 'login'
     @swagger_auto_schema(request_body=LoginSerializer)
 
     def post(self, request):
@@ -38,7 +41,10 @@ class LoginView(APIView):
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 
+
 class VerifyLoginOTPCode2FAView(APIView):
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scoped = 'verfy_otp'
     @swagger_auto_schema(request_body=VerifyOTPCode2FSerializer)
 
     def post(self, request):
