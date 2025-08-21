@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUserModel, EmailCodeModel
+from .models import CustomUserModel, EmailCodeModel, TwoFAModels
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .forms import CustomUserChangeForm, CustomUserCreationForm
 from django.utils.translation import gettext_lazy as _
@@ -33,3 +33,4 @@ class CustomUserAdmin(BaseUserAdmin):
 admin.site.register(CustomUserModel, CustomUserAdmin)
 
 admin.site.register(EmailCodeModel)
+admin.site.register(TwoFAModels)

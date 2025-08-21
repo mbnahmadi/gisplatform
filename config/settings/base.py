@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -41,6 +42,9 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'drf_yasg',
+
+    #phone_number_field
+    'phonenumber_field',
 
     #apps
     'users.apps.UsersConfig',
@@ -73,6 +77,20 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # در صورت نیاز
 ]
 # ----------------------------------------------------
+
+# ---------- simple JWT -----------------------------
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=3600), # access token 
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=10), # refresh token
+    'BLACKLIST_AFTER_ROTATION': True,
+    'UPDATE_LAST_LOGIN': True,  #اگه کاربر از طریق jwt احراز هویت کنه  ازین طریق اخرین لاگینش به روز رسانی میشه در دیتابیس
+}
+# ---------------------------------------------------
+
+
+# ---------------- default phone number field ------------------------
+PHONENUMBER_DEFAULT_REGION = 'IR'
+# --------------------------------------------------------------------
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

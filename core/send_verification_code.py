@@ -1,5 +1,6 @@
 import random
 from users.models.email_code_models import EmailCodeModel
+# from users.models.
 from rest_framework.exceptions import ValidationError
 from django.core.mail import send_mail
 from datetime import timedelta
@@ -32,3 +33,11 @@ def send_code_to_email(user, purpose):
         raise ValidationError(f"Failed to send email: {str(e)}") 
 
     return True
+
+
+
+def send_otp_code(user, purpose):
+    '''
+    فقط کد ارسال میکنه برای تایید موبایل و همچنین لاگین برای احراز هویت دو مرحله ای
+    '''
+    pass
