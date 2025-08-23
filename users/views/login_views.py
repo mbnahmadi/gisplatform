@@ -1,4 +1,3 @@
-from django.core.serializers import serialize
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework.response import Response

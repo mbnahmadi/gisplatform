@@ -21,16 +21,22 @@ from users.views import (
     VerifyEmailView,
     ResendVerificationCodeView,
     LoginView,
-    VerifyLoginOTPCode2FAView
+    VerifyLoginOTPCode2FAView,
+    LogOutView
 )
 
 urlpatterns = [
+    # register
     path('register/', RegisterUserView.as_view(), name='register'),
     path('verify-email/', VerifyEmailView.as_view(), name='verify-email'),
     path('resend-verification-code/', ResendVerificationCodeView.as_view(), name='resend-verification-code'),
 
+    # login
     path('login/', LoginView.as_view(), name='login'),
     path('login/refresh/', TokenRefreshView.as_view(), name='login-refresh'),
     path('verify-OTP-2fa/', VerifyLoginOTPCode2FAView.as_view(), name='verify-OTP-2fa'),
+
+    # account
+    path('logout/', LogOutView.as_view(), name='logout'),
 
 ]

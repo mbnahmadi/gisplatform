@@ -43,6 +43,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_yasg',
 
+    'rest_framework_simplejwt.token_blacklist',
+
     #phone_number_field
     'phonenumber_field',
 
@@ -70,7 +72,6 @@ REST_FRAMEWORK = {
         'resend_verification_code': '3/hour',
         'login': '3/minute',
         'verfy_otp': '5/minute'
-
     }
    
 }
