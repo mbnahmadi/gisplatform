@@ -61,7 +61,7 @@ def verify_user_email_code(user, code, purpose):
     return raw_code
 
 
-def verify_user_mobile_2FA_code(user, code, purpose):
+def verify_user_mobile_2FA_code(user, code, mobile, purpose):
     """
     تلاش می‌کند آخرین OTP معتبر را قفل کند و بررسی نماید.
     اگر موفق باشد، OTP را مصرف می‌کند و رکورد otp را برمی‌گرداند.
@@ -76,6 +76,7 @@ def verify_user_mobile_2FA_code(user, code, purpose):
         code_qs = TwoFAModels.objects.select_for_update().filter(
             user=user,
             purpose=purpose,
+            mobile=mobile,
             is_used=False
         ).order_by('-created_at')
 
@@ -87,7 +88,7 @@ def verify_user_mobile_2FA_code(user, code, purpose):
             error_message = "Code expired."
 
         else:
-            EmailCodeModel.objects.filter(pk=raw_code.pk).update(attempts=F('attempts') + 1)
+            TwoFAModels.objects.filter(pk=raw_code.pk).update(attempts=F('attempts') + 1)
 
             # refresh از DB تا مقدار واقعی attempts را داشته باشیم
             raw_code.refresh_from_db(fields=['attempts'])

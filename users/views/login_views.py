@@ -18,11 +18,11 @@ class LoginView(APIView):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             result = serializer.save()
-
+            # mobile = result['user'].towfa.
             if result['2FA_required']:
                 send_otp_code(result['user'], 'login_2FA_OTP')
                 return Response({
-                    'message': '2FA code send to user mobile.',
+                    'message': '2FA OTP code send to user mobile.',
                     'user': result['user']
                 }, status=status.HTTP_200_OK)
             user = result['user']
@@ -47,7 +47,7 @@ class VerifyLoginOTPCode2FAView(APIView):
     @swagger_auto_schema(request_body=VerifyOTPCode2FSerializer)
 
     def post(self, request):
-        serializer = VerifyOTPCode2FSerializer(data=request.data, context={'request': request})
+        serializer = VerifyOTPCode2FSerializer(data=request.data, context={'request': request, 'purpose': 'Login_2FA'})
         if serializer.is_valid():
             user = serializer.save()
             refresh = RefreshToken.for_user(user)

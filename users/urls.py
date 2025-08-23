@@ -22,21 +22,29 @@ from users.views import (
     ResendVerificationCodeView,
     LoginView,
     VerifyLoginOTPCode2FAView,
-    LogOutView
+    LogOutView,
+    ChangePasswordView,
+    ChangeUsernameView,
+    RequestEnable2FAView,
+    VerifyEnable2FAView
 )
 
 urlpatterns = [
     # register
     path('register/', RegisterUserView.as_view(), name='register'),
-    path('verify-email/', VerifyEmailView.as_view(), name='verify-email'),
-    path('resend-verification-code/', ResendVerificationCodeView.as_view(), name='resend-verification-code'),
+    path('register/verify-email/', VerifyEmailView.as_view(), name='verify-email'),
+    path('register/resend-verification-code/', ResendVerificationCodeView.as_view(), name='resend-verification-code'),
 
     # login
     path('login/', LoginView.as_view(), name='login'),
     path('login/refresh/', TokenRefreshView.as_view(), name='login-refresh'),
-    path('verify-OTP-2fa/', VerifyLoginOTPCode2FAView.as_view(), name='verify-OTP-2fa'),
+    path('login/verify-OTP-2fa/', VerifyLoginOTPCode2FAView.as_view(), name='verify-OTP-2fa'),
 
     # account
-    path('logout/', LogOutView.as_view(), name='logout'),
+    path('account/logout/', LogOutView.as_view(), name='logout'),
+    path('account/changepassword/', ChangePasswordView.as_view(), name='changepassword'),
+    path('account/Changeusername/', ChangeUsernameView.as_view(), name='Changeusername'),
+    path('account/enabletwofa/request', RequestEnable2FAView.as_view(), name='enabletwofa-request'),
+    path('account/enabletwofa/verfy', VerifyEnable2FAView.as_view(), name='enabletwofa-verfy'),
 
 ]

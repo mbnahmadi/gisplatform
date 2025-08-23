@@ -37,15 +37,17 @@ def send_code_to_email(user, purpose):
 
 
 
-def send_otp_code(user, purpose):
+def send_otp_code(user, mobile, purpose):
     '''
-    فقط کد ارسال میکنه برای تایید موبایل و همچنین لاگین برای احراز هویت دو مرحله ای
+    ابتدا کد رو در دیتابیس میسازه و سپس ارسال میکنه برای تایید موبایل و همچنین لاگین برای احراز هویت دو مرحله ای
     '''
     last_code = TwoFAModels.objects.filter(user=user, purpose=purpose).order_by('-created_at').first()
     if last_code and last_code.created_at > timezone.now() - timedelta(seconds=settings.CODE_RESEND_INTERVAL_SECONDS):
         raise ValidationError('Please wait before requesting another code to send.')
 
-    raw_code = str(random.randint(100000, 99999))
-    TwoFAModels.objects.create(user=user, code=raw_code, purpose=purpose)
-
-    print(f'[Debug] OTP send to {user.mobile}: {raw_code}')
+    raw_code = str(random.randint(100000, 999999))
+    twoFA = TwoFAModels.objects.create(user=user, mobile=mobile, code=raw_code, purpose=purpose)
+    try:
+        print(f'[Debug] OTP send to {twoFA.mobile}: {raw_code}')
+    except Exception as e:
+        raise ValidationError(f"Failed to send sms: {str(e)}") 

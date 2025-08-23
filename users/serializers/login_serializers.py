@@ -48,18 +48,19 @@ User = get_user_model()
 
 class VerifyOTPCode2FSerializer(serializers.Serializer):
     mobile = PhoneNumberField()
-    mobile_2FA_code = serializers.CharField()
+    code = serializers.CharField()
 
     def validate(self, attrs):
-        user_id = self.context['request'].user_id
+        user_id = self.context['request'].user.id
+        purpose = self.context['purpose']
 
         try:
-            user = User.objects.filter(user_id=user_id)
+            user = User.objects.get(id=user_id)
         except User.DoesNotExist:
             raise serializers.ValidationError('User not found.')
 
         try:
-            otp = verify_user_mobile_2FA_code(user, attrs['mobile_2FA_code'], 'Login_2FA')
+            otp = verify_user_mobile_2FA_code(user, attrs['code'], attrs['mobile'], purpose)
         except ValidationError as e:
             raise serializers.ValidationError(str(e))
 

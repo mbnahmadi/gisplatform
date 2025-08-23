@@ -9,16 +9,17 @@ from django.utils.translation import gettext_lazy as _
 
 class TwoFAModels(models.Model):
     PURPOSE_CHOICES = (
-        ('Verfy phone', 'verify_phone'),
-        ('Login 2FA', 'Login_2FA')
+        ('verify_phone', 'Verfy phone'),
+        ('Login_2FA', 'Login 2FA')
     )
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("user"), on_delete=models.CASCADE)
-    mobile = PhoneNumberField(verbose_name=_('phone number'))
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("user"), on_delete=models.CASCADE, related_name='twofa')
+    mobile = PhoneNumberField(verbose_name=_('phone number'), unique=True)
+    code = models.CharField(verbose_name=_('Code'), max_length=128)
     is_used = models.BooleanField(default=False, verbose_name=_('is_used'))
     purpose = models.CharField(max_length=20, choices=PURPOSE_CHOICES, verbose_name=_('purpose'))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('created at'))
     attempts = models.IntegerField(default=0, null=False, verbose_name=_('attempts'))
-    is_mobile_verified = models.BooleanField(_("phone number verified?"))
+    is_mobile_verified = models.BooleanField(_("phone number verified?"), default=False)
 
     
     def save(self, *args, **kwargs):
@@ -32,7 +33,7 @@ class TwoFAModels(models.Model):
 
     
     def is_expired(self):
-        expiry_time = self.created_at + timedelta(seconds=settings.VERIFICATION_CODE_VERIFICATION_CODE_EXPIRE_SECONDS)
+        expiry_time = self.created_at + timedelta(seconds=settings.VERIFICATION_CODE_EXPIRE_SECONDS)
         return timezone.now() > expiry_time # expires after 5 min
 
 

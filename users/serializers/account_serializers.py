@@ -1,3 +1,4 @@
+import email
 from tokenize import TokenError
 
 from django.contrib.auth.password_validation import validate_password
@@ -5,23 +6,11 @@ from users.models.two_FA_models import TwoFAModels
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import check_password, 
+from django.contrib.auth.hashers import check_password
 from rest_framework import serializers
 
 
 User = get_user_model()
-
-class RequestEnable2FA(serializers.Serializer):
-    mobile = PhoneNumberField()
-    def validate(self, attrs):
-        user = self.context['request'].user
-        mobile = attrs.get('mobile')
-        try:
-            user = User.objects.get(user=user)
-        except User.DoesNotExist:
-            raise serializers.ValidationError('User not found.')
-
-
 
 
 class LogoutSerializer(serializers.Serializer):
@@ -34,20 +23,9 @@ class LogoutSerializer(serializers.Serializer):
 
 
 class ChangePasswordSerializer(serializers.Serializer):
-    old_password = serializers.CharField(wrtie_only=True)
-    new_password = serializers.CharField(wrtie_only=True)
-    confirm_password = serializers.CharField(wrtie_only=True)
-
-        # user = self.context['request'].user
-
-        # try:
-        #     User.objects.filter(user_id=user.id).first()
-
-        # except User.DoesNotExist:
-        #     raise serializers.ValidationError('User not found.')
-    # def validate_old_password(self, value):
-    #     if self.old_password
-        
+    old_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
         user = self.context['request'].user
@@ -65,5 +43,62 @@ class ChangePasswordSerializer(serializers.Serializer):
 
     def save(self):
         user = self.context['request'].user
-        user.set_password
+        user.set_password(self.validated_data['new_password'])
+        user.save()
         
+
+class ChangeUsernameSerializer(serializers.Serializer):
+    new_username = serializers.CharField()
+
+    def validate(self, attrs):
+        value = attrs['new_username'].lower().strip() # strip حذف اسپیس فقط از اول و اخر رشته
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError('This username already exist.')
+        return attrs
+
+
+    def save(self, **kwargs):
+        user = self.context['request'].user
+        new_username = self.validated_data.get('new_username')
+
+        user.username = new_username
+        user.save()
+        return user
+
+
+
+
+class ChangeEmailSerializer(serializers.Serializer):
+    new_email = serializers.EmailField()
+
+    def validate(self, attrs):
+        value = attrs['new_email'].lower().strip() # strip حذف اسپیس فقط از اول و اخر رشته
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError('This email already exist.')
+        return attrs
+
+
+    def save(self, **kwargs):
+        user = self.context['request'].user
+        new_email = self.validated_data('new_email')
+
+        user.email = new_email
+        user.is_email_verified = False
+        user.is_active = False
+        user.save()
+        return user
+
+
+class RequestEnable2FASerializer(serializers.Serializer):
+    mobile = PhoneNumberField()
+    def validate(self, attrs):
+        mobile = attrs.get('mobile')
+
+        if TwoFAModels.objects.filter(mobile=mobile).exists():
+            raise serializers.ValidationError('This mobile is already verified.')
+
+        # self.twoFA = twoFA
+        return attrs
+    
+
+
