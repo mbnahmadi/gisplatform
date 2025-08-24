@@ -13,13 +13,11 @@ class TwoFAModels(models.Model):
         ('Login_2FA', 'Login 2FA')
     )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("user"), on_delete=models.CASCADE, related_name='twofa')
-    mobile = PhoneNumberField(verbose_name=_('phone number'), unique=True)
     code = models.CharField(verbose_name=_('Code'), max_length=128)
     is_used = models.BooleanField(default=False, verbose_name=_('is_used'))
     purpose = models.CharField(max_length=20, choices=PURPOSE_CHOICES, verbose_name=_('purpose'))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('created at'))
     attempts = models.IntegerField(default=0, null=False, verbose_name=_('attempts'))
-    is_mobile_verified = models.BooleanField(_("phone number verified?"), default=False)
 
     
     def save(self, *args, **kwargs):
@@ -49,4 +47,4 @@ class TwoFAModels(models.Model):
 
 
     def __str__(self):
-        return f"{self.user.username} - {self.user.email} - {self.mobile}"
+        return f"{self.user.username} - {self.user.mobile}"

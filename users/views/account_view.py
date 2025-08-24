@@ -1,5 +1,11 @@
-from users.serializers.account_serializers import LogoutSerializer, ChangePasswordSerializer, RequestEnable2FASerializer, ChangeUsernameSerializer
-from users.serializers.login_serializers import VerifyOTPCode2FSerializer
+from users.serializers.account_serializers import (
+    LogoutSerializer, 
+    ChangePasswordSerializer, 
+    RequestEnable2FASerializer, 
+    ChangeUsernameSerializer,
+    VerifyOTPCode2FSerializer
+    )
+
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -82,11 +88,10 @@ class RequestEnable2FAView(APIView):
     )
 
     def post(self, request):
-        serializer = RequestEnable2FASerializer(data=request.data)
+        serializer = RequestEnable2FASerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            # serializer.save()
-            mobile = serializer.validated_data['mobile']
-            send_otp_code(request.user, mobile, 'verify_phone')
+            user = serializer.save()
+            send_otp_code(user, 'verify_phone')
             return Response({
                 'message': 'OTP code send to user mobile.',
                 }, status=status.HTTP_200_OK)
@@ -105,8 +110,6 @@ class VerifyEnable2FAView(APIView):
         serializer = VerifyOTPCode2FSerializer(data=request.data, context={'request': request, 'purpose': 'verify_phone'})
         if serializer.is_valid():
             serializer.save()
-            # refresh = RefreshToken.for_user(user)
-            # update_last_login(None, user)
             return Response({
                 'message': '2 factory authenticate enabled successfully.',
             }, status=status.HTTP_200_OK)

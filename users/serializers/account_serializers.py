@@ -1,6 +1,6 @@
 import email
 from tokenize import TokenError
-
+from core.verify_code import verify_user_mobile_2FA_code
 from django.contrib.auth.password_validation import validate_password
 from users.models.two_FA_models import TwoFAModels
 from phonenumber_field.serializerfields import PhoneNumberField
@@ -94,11 +94,59 @@ class RequestEnable2FASerializer(serializers.Serializer):
     def validate(self, attrs):
         mobile = attrs.get('mobile')
 
-        if TwoFAModels.objects.filter(mobile=mobile).exists():
-            raise serializers.ValidationError('This mobile is already verified.')
+        if User.objects.filter(mobile=mobile).exists():
+            raise serializers.ValidationError('This mobile already exist.')
 
         # self.twoFA = twoFA
         return attrs
     
+    def save(self):
+        mobile = self.validated_data.get('mobile')
+        user = self.context['request'].user
+        
+        user.mobile = mobile
+        user.is_2FA_enabled = False
+        user.is_mobile_verified = False
+
+        user.save()
+        return user
+        
 
 
+
+class VerifyOTPCode2FSerializer(serializers.Serializer):
+    mobile = PhoneNumberField()
+    code = serializers.CharField()
+
+    def validate(self, attrs):
+        user = self.context['request'].user
+        # purpose = self.context['purpose']
+        user_mobile = attrs.get('mobile')
+        print('user', user)
+
+        try:
+            user = User.objects.get(id=user.id)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('User not found.')
+        if not user.mobile == user_mobile:
+            # print('user.mobile',user.mobile)
+            # print('user_mobile', user_mobile)
+            raise serializers.ValidationError('This mobile is not for this user.')
+        try:
+            otp = verify_user_mobile_2FA_code(user, attrs['code'], 'verify_phone')
+        except Exception as e:
+            raise serializers.ValidationError(str(e))
+
+        self.otp = otp
+        self.user = user
+        return attrs
+
+    def save(self):
+        self.user.is_2FA_enabled = True
+        self.user.is_mobile_verified = True
+        self.user.save()
+        self.otp.is_used = True
+        self.otp.save(update_fields=['is_used'])
+        self.otp.save()
+
+        return self.user

@@ -9,6 +9,7 @@ from rest_framework import serializers
 from core.verify_code import verify_user_mobile_2FA_code
 from users.models.two_FA_models import TwoFAModels
 
+User = get_user_model()
 
 class LoginSerializer(serializers.Serializer):
     identifier = serializers.CharField()
@@ -36,7 +37,8 @@ class LoginSerializer(serializers.Serializer):
             # send_otp_code(user, 'login_2FA_OTP') 
             return {
                 '2FA_required': True,
-                'user': user
+                'user': user,
+                'user_mobile': str(user.mobile)
             }
 
         return {
@@ -44,24 +46,29 @@ class LoginSerializer(serializers.Serializer):
             'user': user
         }
 
-User = get_user_model()
 
-class VerifyOTPCode2FSerializer(serializers.Serializer):
+        
+
+class VerifyLoginOTPCode2FSerializer(serializers.Serializer):
     mobile = PhoneNumberField()
     code = serializers.CharField()
 
     def validate(self, attrs):
-        user_id = self.context['request'].user.id
-        purpose = self.context['purpose']
+        # user = self.context['request'].user
+        user_mobile = attrs.get('mobile')
+        print('user_mobile', user_mobile)
 
         try:
-            user = User.objects.get(id=user_id)
+            user = User.objects.get(mobile=user_mobile)
         except User.DoesNotExist:
             raise serializers.ValidationError('User not found.')
-
+        # if not user.mobile == user_mobile:
+        #     # print('user.mobile',user.mobile)
+        #     # print('user_mobile', user_mobile)
+        #     raise serializers.ValidationError('This mobile is not for this user.')
         try:
-            otp = verify_user_mobile_2FA_code(user, attrs['code'], attrs['mobile'], purpose)
-        except ValidationError as e:
+            otp = verify_user_mobile_2FA_code(user, attrs['code'], 'Login_2FA')
+        except Exception as e:
             raise serializers.ValidationError(str(e))
 
         self.otp = otp
@@ -70,15 +77,11 @@ class VerifyOTPCode2FSerializer(serializers.Serializer):
 
     def save(self):
         self.user.is_2FA_enabled = True
+        self.user.is_mobile_verified = True
         self.user.save()
         self.otp.is_used = True
-        self.otp.is_mobile_verified = True
-        self.otp.save(update_fields=['is_mobile_verified', 'is_used'])
+        self.otp.save(update_fields=['is_used'])
         self.otp.save()
 
         return self.user
-
-        
-
-
 

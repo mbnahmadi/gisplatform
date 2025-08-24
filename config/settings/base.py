@@ -58,6 +58,10 @@ CODE_RESEND_INTERVAL_SECONDS = 120 # حداقل فاصله بین ارسال ه�
 VERIFY_CODE_MAX_ATTEMPTS = 3 # تعداد تلاش اشتباه وارد کردن کد 
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        # 'rest_framework.authentication.SessionAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
     'DEFAULT_THROTTLE_CLASSES': [
         'rest_framework.throttling.AnonRateThrottle',
         'rest_framework.throttling.UserRateThrottle',

@@ -13,7 +13,8 @@ class CustomUserAdmin(BaseUserAdmin):
     list_display = ('email', 'username', 'is_email_verified', 'is_2FA_enabled')
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        (_('Personal info'), {'fields': ('username', 'is_email_verified', 'is_2FA_enabled')}),
+        (_('Personal info'), {'fields': ('username', 'is_email_verified')}),
+        (_('2 factor authenticate info'), {'fields': ('is_2FA_enabled', 'mobile', 'is_mobile_verified')}),
         (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )

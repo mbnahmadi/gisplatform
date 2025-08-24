@@ -1,7 +1,6 @@
-from enum import unique
-from pyexpat import model
-from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
+from django.contrib.auth.models import AbstractUser, BaseUserManager
+from phonenumber_field.modelfields import PhoneNumberField
 from django.utils.translation import gettext_lazy as _
 
 class Usermanager(BaseUserManager):
@@ -33,7 +32,12 @@ class Usermanager(BaseUserManager):
 class CustomUserModel(AbstractUser):
     email = models.EmailField(verbose_name=_('Email'), unique=True)
     is_email_verified = models.BooleanField(verbose_name=_('Email verified?'), default=False)
+
     is_2FA_enabled = models.BooleanField(verbose_name=_('2 FA enabled?'), default=False)
+    mobile = PhoneNumberField(verbose_name=_('phone number'), unique=True, null=True, blank=True)
+    is_mobile_verified = models.BooleanField(_("phone number verified?"), default=False)
+
+
 
     objects = Usermanager()
 

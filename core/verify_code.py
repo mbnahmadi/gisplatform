@@ -61,7 +61,7 @@ def verify_user_email_code(user, code, purpose):
     return raw_code
 
 
-def verify_user_mobile_2FA_code(user, code, mobile, purpose):
+def verify_user_mobile_2FA_code(user, code, purpose):
     """
     تلاش می‌کند آخرین OTP معتبر را قفل کند و بررسی نماید.
     اگر موفق باشد، OTP را مصرف می‌کند و رکورد otp را برمی‌گرداند.
@@ -76,7 +76,6 @@ def verify_user_mobile_2FA_code(user, code, mobile, purpose):
         code_qs = TwoFAModels.objects.select_for_update().filter(
             user=user,
             purpose=purpose,
-            mobile=mobile,
             is_used=False
         ).order_by('-created_at')
 
