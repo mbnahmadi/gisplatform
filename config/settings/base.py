@@ -50,6 +50,7 @@ INSTALLED_APPS = [
 
     #apps
     'users.apps.UsersConfig',
+    'notifications.apps.NotificationsConfig'
 ]
 
 AUTH_USER_MODEL = 'users.CustomUserModel'
@@ -99,6 +100,16 @@ SIMPLE_JWT = {
 # ---------------- default phone number field ------------------------
 PHONENUMBER_DEFAULT_REGION = 'IR'
 # --------------------------------------------------------------------
+# ------------ celery ---------------------------------
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/2'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/2'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+# -------------------------------------------------------
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
