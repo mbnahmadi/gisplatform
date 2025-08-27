@@ -1,3 +1,4 @@
+import os
 from .base import *
 
 DEBUG = True
@@ -14,6 +15,8 @@ DATABASES = {
     }
 }
 
+
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' خروجی ایمیل در کنسول
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'  # یا سرور ایمیل خودت

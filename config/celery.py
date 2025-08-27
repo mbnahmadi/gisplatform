@@ -5,7 +5,7 @@ from celery import Celery
 from django.conf import settings
 
 # اگر متغیر محیطی تعریف نشده بود، پیش‌فرض dev استفاده میشه
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.dev')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.development')
 
 app = Celery('config')
 

@@ -7,6 +7,7 @@ from django.core.mail import send_mail
 from datetime import timedelta
 from django.utils import timezone
 from django.conf import settings
+from notifications.tasks import send_email_task
 
 
 def send_code_to_email(user, purpose):
@@ -29,7 +30,8 @@ def send_code_to_email(user, purpose):
     subject = "Here is your code!"
     message = f"continue signing up by entering the code below:\n {raw_code}"
     try:
-        send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email]) # کد رو راسال میکنه به کاربر
+        # send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email]) # کد رو راسال میکنه به کاربر
+        send_email_task.delay(subject, message, user.email)
     except Exception as e:
         raise ValidationError(f"Failed to send email: {str(e)}") 
 
