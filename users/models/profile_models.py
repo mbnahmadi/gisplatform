@@ -6,7 +6,7 @@ from django.utils.translation import gettext_lazy as _
 
 class ProfileModel(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name=_("user"), on_delete=models.CASCADE, related_name='profile')
-    profile_image = models.ImageField(verbose_name=_('Profile Image'), upload_to=f'profile_images/{user_media_image_path}', null=True, blank=True)
+    profile_image = models.ImageField(verbose_name=_('Profile Image'), upload_to=user_media_image_path, null=True, blank=True)
 
 
     class Meta:
