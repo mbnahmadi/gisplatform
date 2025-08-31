@@ -18,7 +18,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProfileModel
-        fields = ['profile_image']
+        fields = ['profile_image', 'profile_image_uploaded']
 
     def get_profile_image(self, obj):
         '''
@@ -56,15 +56,20 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         profile_data = validated_data.pop('profile', {})
         profile = instance.profile  
 
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.save()
+
         # آپدیت فیلدهای User
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
         # آپدیت فیلدهای Profile
-        profile_image = profile_data.get('profile_image')
-        if profile_image:
-            profile.profile_image = profile_image
+        profile = instance.profile
+        profile_image_uploaded = profile_data.get('profile_image_uploaded')
+        if profile_image_uploaded is not None:  # اگر None بود، تغییر نده (برای delete اگر نیاز داشتی، جدا هندل کن)
+            profile.profile_image = profile_image_uploaded
         profile.save()
 
         return instance

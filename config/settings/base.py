@@ -16,7 +16,7 @@ from pathlib import Path
 from datetime import timedelta
 import os
 
-from core.logging import setup_logger
+from core.logging import setup_loggers
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -34,9 +34,6 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-# ----------------- logging -----------------------------
-LOGGER = setup_logger()
-# ---------------------------------------------------
 # Application definition
 
 INSTALLED_APPS = [
@@ -59,6 +56,10 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'notifications.apps.NotificationsConfig'
 ]
+
+# ----------------- logging -----------------------------
+# LOGGER = setup_loggers()
+# ---------------------------------------------------
 
 AUTH_USER_MODEL = 'users.CustomUserModel'
 VERIFICATION_CODE_EXPIRE_SECONDS = 300 # expire after 5 minute

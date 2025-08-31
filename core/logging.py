@@ -1,3 +1,4 @@
+import os
 import logging
 import logging.handlers
 from django.conf import settings
@@ -13,7 +14,7 @@ def _get_handlers(log_filename: str):
     console_handler.setFormatter(formatter)
 
     file_handler = logging.handlers.TimedRotatingFileHandler(
-        filename=settings.BASE_DIR / f"logs/{log_filename}",
+        filename=settings.BASE_DIR / f"logs/{log_filename}",        
         when="midnight",
         backupCount=7,
         encoding="utf-8"
