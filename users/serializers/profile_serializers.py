@@ -74,3 +74,14 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
 
         return instance
     
+
+class GetProfileSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer()
+
+    class Meta:
+        model = get_user_model()
+        fields = ('username', 'email', 'first_name', 'last_name', 'profile')
+        extra_kwargs = {
+            'username': {'read_only': True},
+            'email': {'read_only': True},
+        }
