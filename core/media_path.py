@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import os
 
 def user_media_image_path(instance, filename):

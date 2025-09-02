@@ -41,47 +41,53 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
+    profile_image_uploaded = serializers.ImageField(write_only=True, required=False, allow_null=True)
     profile = ProfileSerializer()
 
     class Meta:
         model = get_user_model()
-        fields = ('username', 'email', 'first_name', 'last_name', 'profile')
+        fields = ('username', 'email', 'first_name', 'last_name', 'profile', 'profile_image_uploaded')
         extra_kwargs = {
             'username': {'read_only': True},
             'email': {'read_only': True},
         }
+    
+    # def validate(self, data):
+    #     profile_image_uploaded = data.get('profile_image_uploaded')
+    #     if profile_image_uploaded:
+    #         profile_serializer = ProfileSerializer(data={'profile_image_uploaded': profile_image_uploaded}, context=self.context)
+    #         profile_serializer.is_valid(raise_exception=True)
+    #     return data
 
     def update(self, instance, validated_data):
-        # جدا کردن داده‌های پروفایل
-        profile_data = validated_data.pop('profile', {})
-        profile = instance.profile  
-
+        # آپدیت فیلدهای User
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.save()
 
-        # آپدیت فیلدهای User
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-
-        # آپدیت فیلدهای Profile
+        # آپدیت Profile
         profile = instance.profile
-        profile_image_uploaded = profile_data.get('profile_image_uploaded')
-        if profile_image_uploaded is not None:  # اگر None بود، تغییر نده (برای delete اگر نیاز داشتی، جدا هندل کن)
+        profile_image_uploaded = validated_data.get('profile_image_uploaded')
+        if profile_image_uploaded is not None:  # اگر None بود، تغییر نده
             profile.profile_image = profile_image_uploaded
-        profile.save()
+            profile.save()
 
         return instance
+    # def update(self, instance, validated_data):
+    #     print('validated_data', validated_data)
+    #     # جدا کردن داده‌های پروفایل
+    #     profile_data = validated_data.pop('profile', {}) or {}# داده های ولید با کلید پروفایل برداشته میشن و داخل پروفایل دیتا قرار میگیرن
+    #     profile = instance.profile 
+
+    #     instance.first_name = validated_data.get('first_name', instance.first_name)
+    #     instance.last_name = validated_data.get('last_name', instance.last_name)
+    #     instance.save()
+
+    #     profile_image_uploaded = profile_data.get('profile_image_uploaded')
+    #     print('profile_image_uploaded', profile_image_uploaded)
+    #     if profile_image_uploaded is not None:  # اگر None بود، تغییر نده (برای delete اگر نیاز داشتی، جدا هندل کن)
+    #         profile.profile_image = profile_image_uploaded
+    #     profile.save()
+
+    #     return instance
     
-
-class GetProfileSerializer(serializers.ModelSerializer):
-    profile = ProfileSerializer()
-
-    class Meta:
-        model = get_user_model()
-        fields = ('username', 'email', 'first_name', 'last_name', 'profile')
-        extra_kwargs = {
-            'username': {'read_only': True},
-            'email': {'read_only': True},
-        }
