@@ -1,8 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate
 from django.core.exceptions import ValidationError
-from django.core.serializers import serialize
-from drf_yasg.utils import APIView, swagger_auto_schema
 from phonenumber_field.serializerfields import PhoneNumberField
 from rest_framework import serializers
 

@@ -65,6 +65,7 @@ AUTH_USER_MODEL = 'users.CustomUserModel'
 VERIFICATION_CODE_EXPIRE_SECONDS = 300 # expire after 5 minute
 CODE_RESEND_INTERVAL_SECONDS = 120 # حداقل فاصله بین ارسال های مجدد کد (rate limit)
 VERIFY_CODE_MAX_ATTEMPTS = 3 # تعداد تلاش اشتباه وارد کردن کد 
+PASSWORD_RESET_TOKEN_TTL_MINUTES = 3600
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

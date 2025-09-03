@@ -1,3 +1,4 @@
+import uuid
 from django.utils import timezone
 from datetime import timedelta
 from django.conf import settings
@@ -9,6 +10,7 @@ from django.utils.translation import gettext_lazy as _
 class EmailCodeModel(models.Model):
     PURPOSE_CHOICES = (
         ('verify_email', 'Verify Email'),
+        ('reset_password', 'Reset Password'),
     )
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_('User'))
@@ -43,3 +45,27 @@ class EmailCodeModel(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.user.email}"
+
+
+
+class ResetPasswordTokenModel(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_('User'), related_name='reset_password')
+    token = models.UUIDField(verbose_name=_('token'), default=uuid.uuid4, editable=False, unique=True)
+    is_used = models.BooleanField(verbose_name=_('is_used'), default=False)
+    created_at = models.DateTimeField(verbose_name=_('created at'), auto_now_add=True)
+
+    def is_expired(self) -> bool:
+        expiry_time = self.created_at + timedelta(seconds=settings.PASSWORD_RESET_TOKEN_TTL_MINUTES)
+        return timezone.now() > expiry_time
+
+    def mark_as_used(self):
+        self.is_used = True
+        self.save(update_fields=['is_used'])
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["user", "is_used", "-created_at"]),
+        ]
+
+    def __str__(self):
+        return f"{self.user_id} - {self.token}"
