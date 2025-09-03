@@ -42,15 +42,21 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
     profile_image_uploaded = serializers.ImageField(write_only=True, required=False, allow_null=True)
+    remove_profile_image = serializers.BooleanField(write_only=True, required=False, default=False)  
     profile = ProfileSerializer()
 
     class Meta:
         model = get_user_model()
-        fields = ('username', 'email', 'first_name', 'last_name', 'profile', 'profile_image_uploaded')
+        fields = ('username', 'email', 'first_name', 'last_name', 'profile', 'profile_image_uploaded', 'remove_profile_image')
         extra_kwargs = {
             'username': {'read_only': True},
             'email': {'read_only': True},
         }
+
+    # def get_full_name(self, obj):
+    #     if obj.first_name and obj.last_name:
+    #         return f'{obj.first_name} {obj.last_name}'
+    #     return None
     
     # def validate(self, data):
     #     profile_image_uploaded = data.get('profile_image_uploaded')
@@ -63,15 +69,22 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         # آپدیت فیلدهای User
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
+        # اگه کاربر توی درخواستش فامیلی رو داد توی اینستنس سیو کن اگه نداد از همون فامیلی قبلی استفاده کن 
         instance.save()
 
-        # آپدیت Profile
         profile = instance.profile
+
+        if validated_data.pop('remove_profile_image', False):
+            if profile.profile_image:
+                profile.profile_image.delete(save=False)
+            profile.profile_image = None
+            # profile.save()
+
         profile_image_uploaded = validated_data.get('profile_image_uploaded')
         if profile_image_uploaded is not None:  # اگر None بود، تغییر نده
             profile.profile_image = profile_image_uploaded
-            profile.save()
 
+        profile.save()
         return instance
     # def update(self, instance, validated_data):
     #     print('validated_data', validated_data)

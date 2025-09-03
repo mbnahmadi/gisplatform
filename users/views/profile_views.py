@@ -25,14 +25,15 @@ class ProfileView(APIView):
             openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING),
             openapi.Parameter('first_name', openapi.IN_FORM, description='first name', type=openapi.TYPE_STRING, required=False),
             openapi.Parameter('last_name', openapi.IN_FORM, description='last name', type=openapi.TYPE_STRING, required=False),
-            openapi.Parameter('profile_image_uploaded', openapi.IN_FORM, description='Profile image file', type=openapi.TYPE_FILE, required=False)
+            openapi.Parameter('profile_image_uploaded', openapi.IN_FORM, description='Profile image file', type=openapi.TYPE_FILE, required=False),
+            openapi.Parameter('remove_profile_image', openapi.IN_FORM, description='Set true to remove profile image', type=openapi.TYPE_BOOLEAN, required=False),
         ]
     )
 
     def put(self, request):
         # partial باعث میشه نخوایم همه فیلد هارو بفرستیم
         serializer = ProfileUpdateSerializer(request.user, data=request.data, partial=True, context={'request': request})
-        print(request.data)
+        # print(request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
