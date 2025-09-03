@@ -13,7 +13,7 @@ It is designed to provide a production-ready, extensible foundation for authenti
 - Mobile verification via **OTP (One-Time Password)**
 - Two-Factor Authentication (2FA) after login
 - Password reset via **email**
-- User profile management with profile picture upload
+- User profile management with profile picture upload/remove
 - Activity log for tracking user actions
 - **Swagger & ReDoc API documentation**
 
@@ -35,11 +35,10 @@ Authentication is a critical part of any application. Instead of rewriting it fo
 This system can serve as the foundation for any web or mobile project requiring secure authentication.
 
 ## In Progress / Upcoming Features:
-- SMS integration for 2FA (currently only console-based)  
-- User profile management  
+- SMS integration for 2FA (currently only console-based)    
 - Disable/enable 2FA  
 - Email change process with verification  
-- Password reset via email & mobile OTP  
+- Password reset via email  
 - Advanced logging system (partially implemented)  
 
 
