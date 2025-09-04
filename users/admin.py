@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
-from .models import CustomUserModel, EmailCodeModel, TwoFAModels, ProfileModel
+
+from .models import CustomUserModel, EmailCodeModel, TwoFAModels, ProfileModel, ResetPasswordTokenModel
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin # فقط برای خود یوزر تعریف شده
 from .forms import CustomUserChangeForm, CustomUserCreationForm
 from django.utils.translation import gettext_lazy as _
@@ -60,6 +61,7 @@ admin.site.register(CustomUserModel, CustomUserAdmin)
 
 admin.site.register(EmailCodeModel)
 admin.site.register(TwoFAModels)
+admin.site.register(ResetPasswordTokenModel)
 
 
 

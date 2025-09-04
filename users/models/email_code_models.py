@@ -49,13 +49,13 @@ class EmailCodeModel(models.Model):
 
 
 class ResetPasswordTokenModel(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_('User'), related_name='reset_password')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_('User'), related_name='reset_password_token')
     token = models.UUIDField(verbose_name=_('token'), default=uuid.uuid4, editable=False, unique=True)
     is_used = models.BooleanField(verbose_name=_('is_used'), default=False)
     created_at = models.DateTimeField(verbose_name=_('created at'), auto_now_add=True)
 
     def is_expired(self) -> bool:
-        expiry_time = self.created_at + timedelta(seconds=settings.PASSWORD_RESET_TOKEN_TTL_MINUTES)
+        expiry_time = self.created_at + timedelta(seconds=settings.VERIFICATION_TOKEN_EXPIRE_SECONDS)
         return timezone.now() > expiry_time
 
     def mark_as_used(self):

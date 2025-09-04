@@ -16,7 +16,7 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField()
 
     def validate(self, attrs):
-        identifier = attrs.get('identifier')
+        identifier = attrs.get('identifier').lower().strip()
         password = attrs.get('password')
 
         user = authenticate(username=identifier, password=password)

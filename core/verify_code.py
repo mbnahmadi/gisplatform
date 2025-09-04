@@ -1,5 +1,5 @@
 from rest_framework.exceptions import ValidationError
-from users.models.email_code_models import EmailCodeModel
+from users.models.email_code_models import EmailCodeModel, ResetPasswordTokenModel
 from users.models.two_FA_models import TwoFAModels
 from django.db.models import F
 from django.db import transaction
@@ -112,3 +112,30 @@ def verify_user_mobile_2FA_code(user, code, purpose):
 
     return raw_code
 
+
+def verify_reset_password_link(token):
+
+    error_message = ''
+    with transaction.atomic():
+        code_qs = ResetPasswordTokenModel.objects.select_for_update().filter(
+            token=token,
+            is_used=False
+        ).order_by('-created_at')
+
+        token_obj = code_qs.first()
+        if not token_obj:
+            error_message = "Invalid code or already used token."
+        elif token_obj.is_expired():
+            error_message = "Code expired."  
+        else:
+            token_obj.mark_as_used()
+
+            ResetPasswordTokenModel.objects.filter(
+                user=token_obj.user,
+                is_used=False
+            ).exclude(id=token_obj.id).update(is_used=True)
+
+    if error_message:
+        raise ValidationError(error_message)
+
+    return token_obj.user
