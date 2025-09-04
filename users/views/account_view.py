@@ -3,7 +3,9 @@ from users.serializers.account_serializers import (
     ChangePasswordSerializer, 
     RequestEnable2FASerializer, 
     ChangeUsernameSerializer,
-    VerifyOTPCode2FSerializer
+    VerifyOTPCode2FSerializer,
+    RequestDisable2FASerializer,
+    ConfirmDisable2FASerializer
     )
 
 from rest_framework.throttling import ScopedRateThrottle
@@ -107,10 +109,48 @@ class VerifyEnable2FAView(APIView):
             manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
     )
     def post(self, request):
-        serializer = VerifyOTPCode2FSerializer(data=request.data, context={'request': request, 'purpose': 'verify_phone'})
+        serializer = VerifyOTPCode2FSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response({
                 'message': '2 factory authenticate enabled successfully.',
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RequestDisable2FAView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    @swagger_auto_schema(request_body=RequestDisable2FASerializer,
+            manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
+    )
+
+    def post(self, request):
+        serializer = RequestDisable2FASerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({
+                "detail": "OTP sent to user mobile.",
+                "user": {
+                    "id": user.id,
+                    "mobile": str(user.mobile),
+                }
+                }, status=status.HTTP_200_OK)
+
+
+class ConfirmDisable2FAView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    @swagger_auto_schema(request_body=ConfirmDisable2FASerializer,
+            manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
+    )
+    def post(self, request):
+        serializer = ConfirmDisable2FASerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'message': '2 factory authenticate disabled successfully.',
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

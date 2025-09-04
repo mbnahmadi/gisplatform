@@ -29,7 +29,9 @@ from users.views import (
     VerifyEnable2FAView,
     ProfileView,
     ResetPasswordRequestView,
-    ResetPasswordConfirmView
+    ResetPasswordConfirmView,
+    RequestDisable2FAView,
+    ConfirmDisable2FAView
 )
 
 urlpatterns = [
@@ -49,6 +51,8 @@ urlpatterns = [
     path('account/Changeusername/', ChangeUsernameView.as_view(), name='Changeusername'),
     path('account/enabletwofa/request/', RequestEnable2FAView.as_view(), name='enabletwofa-request'),
     path('account/enabletwofa/verfy/', VerifyEnable2FAView.as_view(), name='enabletwofa-verfy'),
+    path('account/disabletwofa/request/', RequestDisable2FAView.as_view(), name='disabletwofa-request'),
+    path('account/disabletwofa/confirm/', ConfirmDisable2FAView.as_view(), name='disabletwofa-confirm'),
 
     # profile
     path('prifile/', ProfileView.as_view(), name='profile'),
