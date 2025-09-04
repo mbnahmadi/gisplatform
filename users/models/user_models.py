@@ -35,6 +35,7 @@ class CustomUserModel(AbstractUser):
 
     is_2FA_enabled = models.BooleanField(verbose_name=_('2 FA enabled?'), default=False)
     mobile = PhoneNumberField(verbose_name=_('phone number'), unique=True, null=True, blank=True)
+    pending_mobile = PhoneNumberField(null=True, blank=True)
     is_mobile_verified = models.BooleanField(_("phone number verified?"), default=False)
 
 

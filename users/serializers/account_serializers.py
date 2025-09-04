@@ -67,29 +67,6 @@ class ChangeUsernameSerializer(serializers.Serializer):
         return user
 
 
-
-
-class ChangeEmailSerializer(serializers.Serializer):
-    new_email = serializers.EmailField()
-
-    def validate(self, attrs):
-        value = attrs['new_email'].lower().strip() # strip حذف اسپیس فقط از اول و اخر رشته
-        if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError('This email already exist.')
-        return attrs
-
-
-    def save(self, **kwargs):
-        user = self.context['request'].user
-        new_email = self.validated_data('new_email')
-
-        user.email = new_email
-        user.is_email_verified = False
-        user.is_active = False
-        user.save()
-        return user
-
-
 class RequestEnable2FASerializer(serializers.Serializer):
     mobile = PhoneNumberField()
     def validate(self, attrs):
@@ -211,4 +188,28 @@ class ConfirmDisable2FASerializer(serializers.Serializer):
 
 
 class ChangeNumber2FASerializer(serializers.Serializer):
+    
+
+
+
+
+class ChangeEmailSerializer(serializers.Serializer):
     pass
+    # new_email = serializers.EmailField()
+
+    # def validate(self, attrs):
+    #     value = attrs['new_email'].lower().strip() # strip حذف اسپیس فقط از اول و اخر رشته
+    #     if User.objects.filter(email=value).exists():
+    #         raise serializers.ValidationError('This email already exist.')
+    #     return attrs
+
+
+    # def save(self, **kwargs):
+    #     user = self.context['request'].user
+    #     new_email = self.validated_data('new_email')
+
+    #     user.email = new_email
+    #     user.is_email_verified = False
+    #     user.is_active = False
+    #     user.save()
+    #     return user
