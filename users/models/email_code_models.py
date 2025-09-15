@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 class EmailCodeModel(models.Model):
     PURPOSE_CHOICES = (
         ('verify_email', 'Verify Email'),
-        ('reset_password', 'Reset Password'),
+        ('change_email', 'Change Email')
     )
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name=_('User'))

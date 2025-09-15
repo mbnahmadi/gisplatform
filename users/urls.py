@@ -31,7 +31,9 @@ from users.views import (
     ResetPasswordRequestView,
     ResetPasswordConfirmView,
     RequestDisable2FAView,
-    ConfirmDisable2FAView
+    ConfirmDisable2FAView,
+    RequestChangeEmailView,
+    ConfirmChangeEmailView
 )
 
 urlpatterns = [
@@ -48,7 +50,9 @@ urlpatterns = [
     # account
     path('account/logout/', LogOutView.as_view(), name='logout'),
     path('account/changepassword/', ChangePasswordView.as_view(), name='changepassword'),
-    path('account/Changeusername/', ChangeUsernameView.as_view(), name='Changeusername'),
+    path('account/changeusername/', ChangeUsernameView.as_view(), name='changeusername'),
+    path('account/changeemail/request/', RequestChangeEmailView.as_view(), name='changeemail-request'),
+    path('account/changeemail/confirm/', ConfirmChangeEmailView.as_view(), name='changeemail-confirm'),
     path('account/enabletwofa/request/', RequestEnable2FAView.as_view(), name='enabletwofa-request'),
     path('account/enabletwofa/verfy/', VerifyEnable2FAView.as_view(), name='enabletwofa-verfy'),
     path('account/disabletwofa/request/', RequestDisable2FAView.as_view(), name='disabletwofa-request'),

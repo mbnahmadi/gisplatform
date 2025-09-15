@@ -1,6 +1,6 @@
 import email
 from tokenize import TokenError
-from core.verify_code import verify_user_mobile_2FA_code
+from core.verify_code import verify_user_mobile_2FA_code, verify_user_email_code
 from django.contrib.auth.password_validation import validate_password
 from users.models.two_FA_models import TwoFAModels
 from phonenumber_field.serializerfields import PhoneNumberField
@@ -188,13 +188,52 @@ class ConfirmDisable2FASerializer(serializers.Serializer):
 
 
 class ChangeNumber2FASerializer(serializers.Serializer):
-    
-
-
-
-
-class ChangeEmailSerializer(serializers.Serializer):
     pass
+
+
+
+
+class RequestChangeEmailSerializer(serializers.Serializer):
+    pending_email = serializers.EmailField()
+
+    def validate_pending_email(self, value):
+        vlaue = value.lower().strip()
+        if User.objects.filter(email=value).exists():
+            raise serializers.ValidationError('This Email is already exist.')
+        
+        return value
+
+    def save(self):
+        user = self.context['request'].user
+        user.pending_email = self.validated_data.get('pending_email')
+        user.is_pending_email_verified = False
+        user.save(update_fields=['pending_email', 'is_pending_email_verified'])
+        return user
+
+class ConfirmChangeEmailSerializer(serializers.Serializer):
+    code = serializers.CharField()
+    pending_email = serializers.EmailField()
+
+    def validate(self, attrs):
+        user = self.context['request'].user
+        if not user.pending_email == attrs['pending_email']:
+            raise serializers.ValidationError('This email is not for this user')
+        try:
+            code = verify_user_email_code(user, attrs['code'], 'change_email')
+        except Exception as e:
+            raise serializers.ValidationError(str(e))
+        self.code = code
+        return attrs
+
+    def save(self):
+        user = self.context['request'].user
+        user.email = self.validated_data.get('pending_email')
+        user.pending_email = None
+        user.save()
+        
+        
+
+    
     # new_email = serializers.EmailField()
 
     # def validate(self, attrs):

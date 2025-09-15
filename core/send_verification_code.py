@@ -31,7 +31,10 @@ def send_code_to_email(user, purpose):
     # raise Exception("Simulated email failure")
 
     subject = "Here is your code!"
-    message = f"continue signing up by entering the code below:\n {raw_code}"
+    if purpose == 'change_email':
+        message = f"Verify your email to change old email:\n {raw_code}"
+    else:
+        message = f"continue signing up by entering the code below:\n {raw_code}"
     try:
         # send_mail(subject, message, settings.DEFAULT_FROM_EMAIL, [user.email]) # کد رو راسال میکنه به کاربر
         send_email_task.delay(subject, message, user.email)

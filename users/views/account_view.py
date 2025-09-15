@@ -5,7 +5,9 @@ from users.serializers.account_serializers import (
     ChangeUsernameSerializer,
     VerifyOTPCode2FSerializer,
     RequestDisable2FASerializer,
-    ConfirmDisable2FASerializer
+    ConfirmDisable2FASerializer,
+    RequestChangeEmailSerializer,
+    ConfirmChangeEmailSerializer
     )
 
 from rest_framework.throttling import ScopedRateThrottle
@@ -152,5 +154,41 @@ class ConfirmDisable2FAView(APIView):
             serializer.save()
             return Response({
                 'message': '2 factory authenticate disabled successfully.',
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RequestChangeEmailView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    @swagger_auto_schema(request_body=RequestChangeEmailSerializer,
+        manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
+    )
+    def post(self, request):
+        serializer = RequestChangeEmailSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            user = serializer.save()
+            send_code_to_email(user, 'change_email')
+            return Response({
+                'detail': 'Verification code has been send to user email.',
+                'user': user.username,
+                'new_email': user.pending_email
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ConfirmChangeEmailView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    @swagger_auto_schema(request_body=ConfirmChangeEmailSerializer,
+        manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
+    )
+    def post(self, request):
+        serializer = ConfirmChangeEmailSerializer(data=request.data, context={'request':request})
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({
+                'message': 'Email has been changed successfully.',
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

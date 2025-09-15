@@ -31,6 +31,8 @@ class Usermanager(BaseUserManager):
 
 class CustomUserModel(AbstractUser):
     email = models.EmailField(verbose_name=_('Email'), unique=True)
+    pending_email = models.EmailField(verbose_name=_('pending Email'), null=True, blank=True)
+    is_pending_email_verified = models.BooleanField(verbose_name=_('Email verified?'), default=False)
     is_email_verified = models.BooleanField(verbose_name=_('Email verified?'), default=False)
 
     is_2FA_enabled = models.BooleanField(verbose_name=_('2 FA enabled?'), default=False)
