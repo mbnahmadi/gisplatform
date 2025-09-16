@@ -29,16 +29,16 @@ It is designed to provide a production-ready, extensible foundation for authenti
 Authentication is a critical part of any application. Instead of rewriting it for every project, this reusable system solves common challenges such as:  
 - Secure login across multiple identifiers (username, email) 
 - Enforcing account verification (email)  
-- Providing strong security with **2FA**  
+- Providing strong security with **2FA**
+- Disable/enable 2FA
+- Password reset via email
+- Email change process with verification  
 - Maintaining user activity logs for auditing  
 
 This system can serve as the foundation for any web or mobile project requiring secure authentication.
 
 ## In Progress / Upcoming Features:
-- SMS integration for 2FA (currently only console-based)    
-- Disable/enable 2FA  
-- Email change process with verification  
-- Password reset via email  
+- SMS integration for 2FA (currently only console-based)       
 - Advanced logging system (partially implemented)  
 
 
