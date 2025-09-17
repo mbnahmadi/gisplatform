@@ -45,7 +45,7 @@ def send_code_to_email(user, purpose):
 
 
 
-def send_otp_code(user, purpose):
+def send_otp_code(user, purpose, send_to_pending=False):
     '''
     ابتدا کد رو در دیتابیس میسازه و سپس ارسال میکنه برای تایید موبایل و همچنین لاگین برای احراز هویت دو مرحله ای
     '''
@@ -56,8 +56,10 @@ def send_otp_code(user, purpose):
 
     raw_code = str(random.randint(100000, 999999))
     TwoFAModels.objects.create(user=user, code=raw_code, purpose=purpose)
+
+    target_mobile = user.pending_mobile if send_to_pending else user.mobile
     try:
-        print(f'[Debug] OTP send to {user.mobile}: {raw_code} - {purpose}')
+        print(f'[Debug] OTP send to {target_mobile}: {raw_code} - {purpose}')
     except Exception as e:
         raise ValidationError(f"Failed to send sms: {str(e)}") 
 

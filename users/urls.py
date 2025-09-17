@@ -33,7 +33,8 @@ from users.views import (
     RequestDisable2FAView,
     ConfirmDisable2FAView,
     RequestChangeEmailView,
-    ConfirmChangeEmailView
+    ConfirmChangeEmailView,
+    RequestChangeNumber2FAView
 )
 
 urlpatterns = [
@@ -57,6 +58,9 @@ urlpatterns = [
     path('account/enabletwofa/verfy/', VerifyEnable2FAView.as_view(), name='enabletwofa-verfy'),
     path('account/disabletwofa/request/', RequestDisable2FAView.as_view(), name='disabletwofa-request'),
     path('account/disabletwofa/confirm/', ConfirmDisable2FAView.as_view(), name='disabletwofa-confirm'),
+
+    path('account/changenumber/request/', RequestChangeNumber2FAView.as_view(), name='changenumber-request'),
+    # path('account/changenumber/request/', RequestEnable2FAView.as_view(), name='enabletwofa-request'),
 
     # profile
     path('prifile/', ProfileView.as_view(), name='profile'),

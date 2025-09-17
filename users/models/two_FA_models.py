@@ -12,6 +12,7 @@ class TwoFAModels(models.Model):
         ('verify_phone', 'Verfy phone'),
         ('Login_2FA', 'Login 2FA'),
         ('Disable_2FA', 'Disable 2FA'),
+        ('Change_number', 'Change Number'),
     )
     user = models.ForeignKey(settings.AUTH_USER_MODEL, verbose_name=_("user"), on_delete=models.CASCADE, related_name='twofa')
     code = models.CharField(verbose_name=_('Code'), max_length=128)

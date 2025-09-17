@@ -7,7 +7,9 @@ from users.serializers.account_serializers import (
     RequestDisable2FASerializer,
     ConfirmDisable2FASerializer,
     RequestChangeEmailSerializer,
-    ConfirmChangeEmailSerializer
+    ConfirmChangeEmailSerializer,
+    RequestChangeNumber2FASerializer,
+    ConfirmOldChangeNumber2FASerializer
     )
 
 from rest_framework.throttling import ScopedRateThrottle
@@ -190,5 +192,61 @@ class ConfirmChangeEmailView(APIView):
             user = serializer.save()
             return Response({
                 'message': 'Email has been changed successfully.',
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class RequestChangeNumber2FAView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    @swagger_auto_schema(request_body=RequestChangeNumber2FASerializer,
+        manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
+    )
+
+    def post(self, request):
+        serializer = RequestChangeNumber2FASerializer(data=request.data, context={'request':request})
+        serializer.is_valid(raise_exception=True)
+        try:
+            send_otp_code(request.user, 'verify_phone', send_to_pending=False) # code send to old number
+            return Response({
+                'detail': 'OTP has been send to user mobile.',
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
+
+
+class ConfirmOldChangeNumber2FAView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    @swagger_auto_schema(request_body=ConfirmOldChangeNumber2FASerializer,
+            manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
+    )
+    def post(self, request):
+        serializer = ConfirmOldChangeNumber2FASerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            user = serializer.save()
+            send_otp_code(user, 'change_number', send_to_pending=True) # code must be send to new mobile number
+            return Response({
+                'message': 'OTP has been send to new mobile',
+            }, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class ConfirmNewChangeNumber2FAView(APIView):
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    @swagger_auto_schema(request_body=VerifyOTPCode2FSerializer,
+            manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
+    )
+    def post(self, request):
+        serializer = VerifyOTPCode2FSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'message': 'mobile number changed successfully.',
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

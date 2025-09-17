@@ -1,5 +1,7 @@
 import email
 from tokenize import TokenError
+
+from django.core.serializers import serialize
 from core.verify_code import verify_user_mobile_2FA_code, verify_user_email_code
 from django.contrib.auth.password_validation import validate_password
 from users.models.two_FA_models import TwoFAModels
@@ -183,22 +185,12 @@ class ConfirmDisable2FASerializer(serializers.Serializer):
         return self.user
 
 
-
-
-
-
-class ChangeNumber2FASerializer(serializers.Serializer):
-    pass
-
-
-
-
 class RequestChangeEmailSerializer(serializers.Serializer):
     pending_email = serializers.EmailField()
 
     def validate_pending_email(self, value):
-        vlaue = value.lower().strip()
-        if User.objects.filter(email=value).exists():
+        pending_email = value.lower().strip()
+        if User.objects.filter(email=pending_email).exists():
             raise serializers.ValidationError('This Email is already exist.')
         
         return value
@@ -206,9 +198,9 @@ class RequestChangeEmailSerializer(serializers.Serializer):
     def save(self):
         user = self.context['request'].user
         user.pending_email = self.validated_data.get('pending_email')
-        user.is_pending_email_verified = False
-        user.save(update_fields=['pending_email', 'is_pending_email_verified'])
+        user.save(update_fields=['pending_email'])
         return user
+
 
 class ConfirmChangeEmailSerializer(serializers.Serializer):
     code = serializers.CharField()
@@ -232,23 +224,63 @@ class ConfirmChangeEmailSerializer(serializers.Serializer):
         user.save()
         
         
+class RequestChangeNumber2FASerializer(serializers.Serializer):
+    pending_mobile = PhoneNumberField()
 
+    def validate(self, attrs):
+        user = self.context['request'].user
+        if not user.is_2FA_enabled:
+            raise serializers.ValidationError('Two factor authentication is not enabled for this user.')
+
+        if User.objects.filter(mobile=attrs['pending_mobile']).exists():
+            raise serializers.ValidationError('This mobile is already exist.')
+        return attrs
+
+    def save(self):
+        user = self.context['request'].user
+        user.pending_mobile = self.validated_data['pending_mobile']
+        user.save(update_fields=['pending_mobile'])
+        return user    
     
-    # new_email = serializers.EmailField()
 
-    # def validate(self, attrs):
-    #     value = attrs['new_email'].lower().strip() # strip حذف اسپیس فقط از اول و اخر رشته
-    #     if User.objects.filter(email=value).exists():
-    #         raise serializers.ValidationError('This email already exist.')
-    #     return attrs
+class ConfirmOldChangeNumber2FASerializer(serializers.Serializer):
+    code = serializers.CharField()
 
+    def validate(self, attrs):
+        user = self.context['request'].user
+        # purpose = self.context['purpose']
+        # if not user.mobile == user_mobile:
+        #     raise serializers.ValidationError('This mobile is not for this user.')
+        try:
+            verify_user_mobile_2FA_code(user, attrs['code'], 'verify_phone')
+        except Exception as e:
+            raise serializers.ValidationError(str(e))
+        if not user.pending_mobile:
+            raise serializers.ValidationError('No pending mobile set.')
 
-    # def save(self, **kwargs):
-    #     user = self.context['request'].user
-    #     new_email = self.validated_data('new_email')
+        return attrs
 
-    #     user.email = new_email
-    #     user.is_email_verified = False
-    #     user.is_active = False
-    #     user.save()
-    #     return user
+    def save(self):
+        return self.context['request'].user
+        
+
+class ConfirmNewChangeNumber2FASerializer(serializers.Serializer):
+    code = serializers.CharField()
+
+    def validate(self, attrs):
+        user = self.context['request'].user
+        try:
+            verify_user_mobile_2FA_code(user, attrs['code'], 'change_number')
+        except Exception as e:
+            raise serializers.ValidationError(str(e))
+        if not user.pending_mobile:
+            raise serializers.ValidationError('No pending mobile set.')
+        return attrs
+
+    def save(self):
+        user = self.context['request'].user
+        user.mobile = user.pending_mobile
+        user.pending_mobile = None
+        user.is_mobile_verified = True
+        user.save(update_fields=['mobile', 'pending_mobile', 'is_mobile_verified'])
+        return user
