@@ -8,10 +8,13 @@ from core.send_verification_code import send_otp_code
 # from core.verify_code import verify_user_mobile_2FA_code
 from django.contrib.auth.models import update_last_login
 from drf_yasg.utils import swagger_auto_schema
+import logging
+
+login_logger = logging.getLogger('users.login')
 
 class LoginView(APIView):
     throttle_classes = [ScopedRateThrottle]
-    # throttle_scoped = 'login'
+    throttle_scoped = 'login'
     @swagger_auto_schema(request_body=LoginSerializer)
 
     def post(self, request):
@@ -20,13 +23,20 @@ class LoginView(APIView):
             result = serializer.save()
             if result['2FA_required']:
                 send_otp_code(result['user'], 'Login_2FA')
+                # logging
+                login_logger.info(f'{result['user'].id} - ({result['user'].email})/({result['user'].username}) attempted login - 2FA required')
+                
                 return Response({
                     'message': '2FA OTP code send to user mobile.',
                     'user': result['user_mobile']
                 }, status=status.HTTP_200_OK)
+           
             user = result['user']
             refresh = RefreshToken.for_user(user)
             update_last_login(None, user)
+
+            # logging
+            login_logger.info(f'User {user.id} - ({user.email})/({user.username}) logged in successfully (without 2FA)')
             return Response({
                 'token':{
                     'refresh': str(refresh),
@@ -37,6 +47,9 @@ class LoginView(APIView):
                     'email': user.email,
                 }
             }, status=status.HTTP_200_OK)
+            
+        # logging
+        login_logger.warning(f"Login failed. Data: {request.data} Errors: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 
 

@@ -26,6 +26,10 @@ from core.send_verification_code import send_code_to_email
 from django.contrib.auth.models import update_last_login
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+import logging
+
+
+account_logger = logging.getLogger('users.account')
 
 
 class LogOutView(APIView):

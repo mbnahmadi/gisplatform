@@ -9,6 +9,10 @@ from rest_framework.throttling import ScopedRateThrottle
 from drf_yasg.utils import swagger_auto_schema
 from core.send_verification_code import send_code_to_email
 from users.serializers import RegisterUserSerializer, VerifyEmailSerializer, ResendVerificationCodeSerializer
+import logging
+
+
+logger = logging.getLogger('user.login')
 
 User = get_user_model()
 
