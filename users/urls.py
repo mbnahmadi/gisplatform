@@ -34,8 +34,11 @@ from users.views import (
     ConfirmDisable2FAView,
     RequestChangeEmailView,
     ConfirmChangeEmailView,
-    RequestChangeNumber2FAView
+    RequestChangeNumber2FAView,
+    ConfirmOldChangeNumber2FAView,
+    ConfirmNewChangeNumber2FAView
 )
+from users.views.account_view import ConfirmNewChangeNumber2FAView, ConfirmOldChangeNumber2FAView
 
 urlpatterns = [
     # register
@@ -54,12 +57,14 @@ urlpatterns = [
     path('account/changeusername/', ChangeUsernameView.as_view(), name='changeusername'),
     path('account/changeemail/request/', RequestChangeEmailView.as_view(), name='changeemail-request'),
     path('account/changeemail/confirm/', ConfirmChangeEmailView.as_view(), name='changeemail-confirm'),
-    path('account/enabletwofa/request/', RequestEnable2FAView.as_view(), name='enabletwofa-request'),
-    path('account/enabletwofa/verfy/', VerifyEnable2FAView.as_view(), name='enabletwofa-verfy'),
-    path('account/disabletwofa/request/', RequestDisable2FAView.as_view(), name='disabletwofa-request'),
-    path('account/disabletwofa/confirm/', ConfirmDisable2FAView.as_view(), name='disabletwofa-confirm'),
+    path('account/twofa/enable/request/', RequestEnable2FAView.as_view(), name='enabletwofa-request'),
+    path('account/twofa/enable/verfy/', VerifyEnable2FAView.as_view(), name='enabletwofa-verfy'),
+    path('account/twofa/disable/request/', RequestDisable2FAView.as_view(), name='disabletwofa-request'),
+    path('account/twofa/disable/confirm/', ConfirmDisable2FAView.as_view(), name='disabletwofa-confirm'),
 
-    path('account/changenumber/request/', RequestChangeNumber2FAView.as_view(), name='changenumber-request'),
+    path('account/twofa/changenumber/request/', RequestChangeNumber2FAView.as_view(), name='changenumber-request'),
+    path('account/twofa/changenumber/confirm/oldnumber/', ConfirmOldChangeNumber2FAView.as_view(), name='changenumber-confirm-oldnumber'),
+    path('account/twofa/changenumber/confirm/newnumber/', ConfirmNewChangeNumber2FAView.as_view(), name='changenumber-confirm-newnumber'),
     # path('account/changenumber/request/', RequestEnable2FAView.as_view(), name='enabletwofa-request'),
 
     # profile

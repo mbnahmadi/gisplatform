@@ -9,7 +9,8 @@ from users.serializers.account_serializers import (
     RequestChangeEmailSerializer,
     ConfirmChangeEmailSerializer,
     RequestChangeNumber2FASerializer,
-    ConfirmOldChangeNumber2FASerializer
+    ConfirmOldChangeNumber2FASerializer,
+    ConfirmNewChangeNumber2FASerializer
     )
 
 from rest_framework.throttling import ScopedRateThrottle
@@ -239,11 +240,11 @@ class ConfirmNewChangeNumber2FAView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
 
-    @swagger_auto_schema(request_body=VerifyOTPCode2FSerializer,
+    @swagger_auto_schema(request_body=ConfirmNewChangeNumber2FASerializer,
             manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
     )
     def post(self, request):
-        serializer = VerifyOTPCode2FSerializer(data=request.data, context={'request': request})
+        serializer = ConfirmNewChangeNumber2FASerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response({
