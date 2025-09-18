@@ -11,6 +11,8 @@ from drf_yasg.utils import swagger_auto_schema
 
 
 class ResetPasswordRequestView(APIView):
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'resetpassword_request'
     @swagger_auto_schema(request_body=ResetPasswordRequestSerializer)
 
     def post(seld, request):
@@ -25,6 +27,8 @@ class ResetPasswordRequestView(APIView):
 
 
 class ResetPasswordConfirmView(APIView):
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'verfy_otp'
     @swagger_auto_schema(request_body=ResetPasswordConfirmSerializer)
 
     def post(seld, request):

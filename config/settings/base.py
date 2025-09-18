@@ -88,7 +88,13 @@ REST_FRAMEWORK = {
         'email_verify': '5/minute',
         'resend_verification_code': '3/hour',
         'login': '3/minute',
-        'verfy_otp': '5/minute'
+        'verfy_otp': '5/minute',
+        'logout': '20/min',
+        'change_sensitive': '3/hour',
+        'enable2fa_request': '5/hour',
+        'disable2fa_request': '2/hour',
+        'profile': '50/hour',
+        'reset_password': '5/min'
     }
    
 }

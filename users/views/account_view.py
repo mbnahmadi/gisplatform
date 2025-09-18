@@ -29,7 +29,14 @@ from drf_yasg import openapi
 
 
 class LogOutView(APIView):
-    @swagger_auto_schema(request_body=LogoutSerializer)
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'logout'
+
+    @swagger_auto_schema(request_body=LogoutSerializer,
+            manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
+    )
 
     def post(self, request):
         serializer = LogoutSerializer(data=request.data)
@@ -48,6 +55,8 @@ class LogOutView(APIView):
 class ChangePasswordView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'change_sensitive'
 
     @swagger_auto_schema(request_body=ChangePasswordSerializer,
             manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
@@ -69,7 +78,8 @@ class ChangePasswordView(APIView):
 class ChangeUsernameView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
-
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'change_sensitive'
     @swagger_auto_schema(request_body=ChangeUsernameSerializer,
             manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
     )
@@ -88,7 +98,9 @@ class ChangeUsernameView(APIView):
 
 class RequestEnable2FAView(APIView):
     permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
+    authentication_classes = [JWTAuthentication]    
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'enable2fa_request'
 
     @swagger_auto_schema(request_body=RequestEnable2FASerializer,
             manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
@@ -109,6 +121,8 @@ class RequestEnable2FAView(APIView):
 class VerifyEnable2FAView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'verify_otp'
 
     @swagger_auto_schema(request_body=VerifyOTPCode2FSerializer,
             manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
@@ -126,6 +140,8 @@ class VerifyEnable2FAView(APIView):
 class RequestDisable2FAView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'disable2fa_request'
 
     @swagger_auto_schema(request_body=RequestDisable2FASerializer,
             manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
@@ -147,6 +163,8 @@ class RequestDisable2FAView(APIView):
 class ConfirmDisable2FAView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'verify_otp'
 
     @swagger_auto_schema(request_body=ConfirmDisable2FASerializer,
             manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
@@ -164,6 +182,8 @@ class ConfirmDisable2FAView(APIView):
 class RequestChangeEmailView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'change_sensitive'
 
     @swagger_auto_schema(request_body=RequestChangeEmailSerializer,
         manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
@@ -184,6 +204,9 @@ class RequestChangeEmailView(APIView):
 class ConfirmChangeEmailView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'verify_otp'
+
     @swagger_auto_schema(request_body=ConfirmChangeEmailSerializer,
         manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
     )
@@ -201,6 +224,9 @@ class ConfirmChangeEmailView(APIView):
 class RequestChangeNumber2FAView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'change_sensitive'
+
     @swagger_auto_schema(request_body=RequestChangeNumber2FASerializer,
         manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
     )
@@ -220,6 +246,8 @@ class RequestChangeNumber2FAView(APIView):
 class ConfirmOldChangeNumber2FAView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'verify_otp'
 
     @swagger_auto_schema(request_body=ConfirmOldChangeNumber2FASerializer,
             manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]
@@ -239,6 +267,8 @@ class ConfirmOldChangeNumber2FAView(APIView):
 class ConfirmNewChangeNumber2FAView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'verify_otp'
 
     @swagger_auto_schema(request_body=ConfirmNewChangeNumber2FASerializer,
             manual_parameters=[openapi.Parameter('Authorization', openapi.IN_HEADER, description="JWT Token", type=openapi.TYPE_STRING)]

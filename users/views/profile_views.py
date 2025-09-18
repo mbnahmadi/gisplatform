@@ -18,6 +18,8 @@ User = get_user_model()
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'profile'
     parser_classes = (MultiPartParser, FormParser) # باعث میشه request.data و request.FILES باهم ارسال بشن
 # request_body=ProfileUpdateSerializer,
     @swagger_auto_schema(
