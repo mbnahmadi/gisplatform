@@ -19,7 +19,7 @@ import logging.handlers
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 # create log directory
-LOGS_DIR = BASE_DIR / 'config' / 'logs'
+LOGS_DIR = BASE_DIR  / 'logs'
 LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Quick-start development settings - unsuitable for production
@@ -148,46 +148,46 @@ LOGGING = {
     },
     # Specifies where the log messages are sent (console and files)
     'handlers': {
-        'login_file': {
+        'users_file': {
             'level': 'INFO',
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename':  LOGS_DIR / 'auth_login.log',
+            'filename':  LOGS_DIR / 'users.log',
             'maxBytes': 5 * 1024 * 1024,
             'backupCount': 5, # keep 5 old files.
             'formatter': 'verbose',
         },
-        'register_file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': LOGS_DIR / 'auth_register.log',
-            'maxBytes': 5 * 1024 * 1024,
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
-        'account_file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': LOGS_DIR / 'auth_account.log',
-            'maxBytes': 5 * 1024 * 1024,
-            'backupCount': 5,
-            'formatter': 'verbose'
-        },
-        'profile_file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': LOGS_DIR / 'auth_profile.log',
-            'maxBytes': 5 * 1024 * 1024,
-            'backupCount': 5,
-            'formatter': 'verbose'
-        },
-        'resetpassword_file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': LOGS_DIR / 'auth_resetpassword.log',
-            'maxBytes': 5 * 1024 * 1024,
-            'backupCount': 5,
-            'formatter': 'verbose'
-        },
+        # 'register_file': {
+        #     'level': 'INFO',
+        #     'class': 'logging.handlers.RotatingFileHandler',
+        #     'filename': LOGS_DIR / 'auth_register.log',
+        #     'maxBytes': 5 * 1024 * 1024,
+        #     'backupCount': 5,
+        #     'formatter': 'verbose',
+        # },
+        # 'account_file': {
+        #     'level': 'INFO',
+        #     'class': 'logging.handlers.RotatingFileHandler',
+        #     'filename': LOGS_DIR / 'auth_account.log',
+        #     'maxBytes': 5 * 1024 * 1024,
+        #     'backupCount': 5,
+        #     'formatter': 'verbose'
+        # },
+        # 'profile_file': {
+        #     'level': 'INFO',
+        #     'class': 'logging.handlers.RotatingFileHandler',
+        #     'filename': LOGS_DIR / 'auth_profile.log',
+        #     'maxBytes': 5 * 1024 * 1024,
+        #     'backupCount': 5,
+        #     'formatter': 'verbose'
+        # },
+        # 'resetpassword_file': {
+        #     'level': 'INFO',
+        #     'class': 'logging.handlers.RotatingFileHandler',
+        #     'filename': LOGS_DIR / 'auth_resetpassword.log',
+        #     'maxBytes': 5 * 1024 * 1024,
+        #     'backupCount': 5,
+        #     'formatter': 'verbose'
+        # },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -196,31 +196,31 @@ LOGGING = {
     },
 
     'loggers': {
-        'users.account': {
-            'handlers': ['account_file', 'console'],
+        'users': {
+            'handlers': ['users_file', 'console'],
             'level': 'INFO',
             'propagate': False,
         },
-        'users.login': {
-            'handlers': ['login_file', 'console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'users.profile': {
-            'handlers': ['profile_file', 'console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'users.resetpassword': {
-            'handlers': ['resetpassword_file', 'console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'users.register': {
-            'handlers': ['register_file', 'console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
+        # 'users.login': {
+        #     'handlers': ['login_file', 'console'],
+        #     'level': 'INFO',
+        #     'propagate': False,
+        # },
+        # 'users.profile': {
+        #     'handlers': ['profile_file', 'console'],
+        #     'level': 'INFO',
+        #     'propagate': False,
+        # },
+        # 'users.resetpassword': {
+        #     'handlers': ['resetpassword_file', 'console'],
+        #     'level': 'INFO',
+        #     'propagate': False,
+        # },
+        # 'users.register': {
+        #     'handlers': ['register_file', 'console'],
+        #     'level': 'INFO',
+        #     'propagate': False,
+        # },
     },
 }
 # ------------------------------------------------

@@ -24,7 +24,7 @@ class LoginView(APIView):
             if result['2FA_required']:
                 send_otp_code(result['user'], 'Login_2FA')
                 # logging
-                login_logger.info(f'{result['user'].id} - ({result['user'].email})/({result['user'].username}) attempted login - 2FA required')
+                login_logger.info(f'User %s - (%s)/(%s) attempted login - 2FA required',  result['user'].id, result['user'].email, result['user'].username)
                 
                 return Response({
                     'message': '2FA OTP code send to user mobile.',
@@ -36,7 +36,7 @@ class LoginView(APIView):
             update_last_login(None, user)
 
             # logging
-            login_logger.info(f'User {user.id} - ({user.email})/({user.username}) logged in successfully (without 2FA)')
+            login_logger.info(f'User %s - (%s)/(%s) logged in successfully (without 2FA)',  user.id, user.email, user.username)
             return Response({
                 'token':{
                     'refresh': str(refresh),
@@ -49,7 +49,7 @@ class LoginView(APIView):
             }, status=status.HTTP_200_OK)
             
         # logging
-        login_logger.warning(f"Login failed. Data: {request.data} Errors: {serializer.errors}")
+        login_logger.warning('Login failed. Data:  %s Errors: %s', request.data, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 
 
@@ -64,6 +64,8 @@ class VerifyLoginOTPCode2FAView(APIView):
             user = serializer.save()
             refresh = RefreshToken.for_user(user)
             update_last_login(None, user)
+
+            login_logger.info(f'User %s - (%s)/(%s) logged in successfully (with 2FA)',  user.id, user.email, user.username)
             return Response({
                 'token': {
                     'refresh': str(refresh),
@@ -74,5 +76,7 @@ class VerifyLoginOTPCode2FAView(APIView):
                     'email': user.email
                 }
             }, status=status.HTTP_200_OK)
+
+        login_logger.warning('verification code error. Data:  %s Errors: %s', request.data, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         

@@ -48,10 +48,13 @@ class LogOutView(APIView):
         try:
             refresh_token = RefreshToken(serializer.validated_data['refresh'])
             refresh_token.blacklist()
+
+            account_logger.info('User %s -  (%s)/ (%s) logout.', request.user.id, request.user.email, request.user.username)
             return Response({
                 "message": "successfully logged out."
             }, status=status.HTTP_205_RESET_CONTENT)
         except Exception as e:
+            account_logger.warning('failed to logout. Data:  %s Errors: %s', request.data, serializer.errors)
             return Response({str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -70,9 +73,11 @@ class ChangePasswordView(APIView):
         serializer = ChangePasswordSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
+            account_logger.info('User %s -  (%s)/ (%s) changed password successfully.', request.user.id, request.user.email, request.user.username)
             return Response({
                 'message': 'password changed successfully.'
             }, status=status.HTTP_200_OK)
+        account_logger.warning('failed change passwod. Data:  %s Errors: %s', request.data, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -92,10 +97,12 @@ class ChangeUsernameView(APIView):
         serializer = ChangeUsernameSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             user = serializer.save()
+            account_logger.info('User %s -  (%s)/ (%s) changed useranme successfully.', request.user.id, request.user.email, request.user.username)
             return Response({
                 'message': 'Username changed successfully.',
                 'username': user.username,
                 }, status=status.HTTP_200_OK)
+        account_logger.warning('failed change username. Data:  %s Errors: %s', request.data, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -115,9 +122,11 @@ class RequestEnable2FAView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             send_otp_code(user, 'verify_phone')
+            account_logger.info('User %s -  (%s)/ (%s) Request to enable 2 factory authenticate.', request.user.id, request.user.email, request.user.username)
             return Response({
                 'message': 'OTP code send to user mobile.',
                 }, status=status.HTTP_200_OK)
+        account_logger.warning('failed Request to enable 2 factory authenticate. Data:  %s Errors: %s', request.data, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -135,9 +144,11 @@ class VerifyEnable2FAView(APIView):
         serializer = VerifyOTPCode2FSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
+            account_logger.info('User %s -  (%s)/ (%s) confirm enable 2 factory authenticate.', request.user.id, request.user.email, request.user.username)
             return Response({
                 'message': '2 factory authenticate enabled successfully.',
             }, status=status.HTTP_200_OK)
+        account_logger.warning('failed confirm enable 2 factory authenticate. Data:  %s Errors: %s', request.data, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -155,6 +166,7 @@ class RequestDisable2FAView(APIView):
         serializer = RequestDisable2FASerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             user = serializer.save()
+            account_logger.info('User %s -  (%s)/ (%s) Request to Disable 2 factory authenticate.', user.id, user.email, user.username)
             return Response({
                 "detail": "OTP sent to user mobile.",
                 "user": {
@@ -162,6 +174,8 @@ class RequestDisable2FAView(APIView):
                     "mobile": str(user.mobile),
                 }
                 }, status=status.HTTP_200_OK)
+        account_logger.warning('failed Request to Disable 2 factory authenticate. Data:  %s Errors: %s', request.data, serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ConfirmDisable2FAView(APIView):
@@ -177,9 +191,11 @@ class ConfirmDisable2FAView(APIView):
         serializer = ConfirmDisable2FASerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
+            account_logger.info('User %s -  (%s)/ (%s) Confirm to Disable 2 factory authenticate.', request.user.id, request.user.email, request.user.username)
             return Response({
                 'message': '2 factory authenticate disabled successfully.',
             }, status=status.HTTP_200_OK)
+        account_logger.warning('failed confirm to Disable 2 factory authenticate. Data:  %s Errors: %s', request.data, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -197,11 +213,13 @@ class RequestChangeEmailView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             send_code_to_email(user, 'change_email')
+            account_logger.info('User %s -  (%s)/ (%s) Request to change email.', request.user.id, request.user.email, request.user.username)
             return Response({
                 'detail': 'Verification code has been send to user email.',
                 'user': user.username,
                 'new_email': user.pending_email
             }, status=status.HTTP_200_OK)
+        account_logger.warning('failed Request to change email. Data:  %s Errors: %s', request.data, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -217,10 +235,12 @@ class ConfirmChangeEmailView(APIView):
     def post(self, request):
         serializer = ConfirmChangeEmailSerializer(data=request.data, context={'request':request})
         if serializer.is_valid():
-            user = serializer.save()
+            serializer.save()
+            account_logger.info('User %s -  (%s)/ (%s) email changed successfully.', request.user.id, request.user.email, request.user.username)
             return Response({
                 'message': 'Email has been changed successfully.',
             }, status=status.HTTP_200_OK)
+        account_logger.warning('failed to change email. Data:  %s Errors: %s', request.data, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -240,10 +260,12 @@ class RequestChangeNumber2FAView(APIView):
         serializer.is_valid(raise_exception=True)
         try:
             send_otp_code(request.user, 'verify_phone', send_to_pending=False) # code send to old number
+            account_logger.info('User %s -  (%s)/ (%s) Request to change number for 2 FA.', request.user.id, request.user.email, request.user.username)
             return Response({
                 'detail': 'OTP has been send to user mobile.',
             }, status=status.HTTP_200_OK)
         except Exception as e:
+            account_logger.warning('failed to Request to change number for 2 FA. Data:  %s Errors: %s', request.data, serializer.errors)
             return Response(str(e), status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -261,9 +283,11 @@ class ConfirmOldChangeNumber2FAView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             send_otp_code(user, 'change_number', send_to_pending=True) # code must be send to new mobile number
+            account_logger.info('User %s -  (%s)/ (%s) confirm old number of 2 FA.', request.user.id, request.user.email, request.user.username)
             return Response({
                 'message': 'OTP has been send to new mobile',
             }, status=status.HTTP_200_OK)
+        account_logger.warning('failed to confirm old number of 2 FA. Data:  %s Errors: %s', request.data, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -281,7 +305,9 @@ class ConfirmNewChangeNumber2FAView(APIView):
         serializer = ConfirmNewChangeNumber2FASerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
+            account_logger.info('User %s -  (%s)/ (%s) confirm new number of 2 FA and number changed.', request.user.id, request.user.email, request.user.username)
             return Response({
                 'message': 'mobile number changed successfully.',
             }, status=status.HTTP_200_OK)
+        account_logger.warning('failed to confirm new number of 2 FA. Data:  %s Errors: %s', request.data, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

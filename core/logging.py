@@ -3,14 +3,14 @@ from copy import deepcopy
 SENSITIVE_FIELDS = {
     'password',
     'confirm_password',
-    'old_password', 'new_password', 'otp', 'otp_code'
+    'old_password', 'new_password', 'otp', 'otp_code', 'code'
 }
 
 def senetize_data(data):
     """
     Remove sensitive fields from user data before logging.
     """
-    if not isinstance(data, dict): # Is data a dict? isinstance(obj, type)
+    if not isinstance(data, dict): # Is data type dict? isinstance(obj, type)
         return data
 
     cleaned = deepcopy(data)

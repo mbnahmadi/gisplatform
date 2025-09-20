@@ -1,3 +1,4 @@
+import logging
 from django.contrib.auth import get_user_model
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -11,6 +12,10 @@ from django.contrib.auth.models import update_last_login
 from rest_framework.parsers import MultiPartParser, FormParser
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+import logging
+
+
+profile_logger = logging.getLogger('users.profile')
 
 
 User = get_user_model()
@@ -38,7 +43,10 @@ class ProfileView(APIView):
         # print(request.data)
         if serializer.is_valid():
             serializer.save()
+            # profile_logger.info(f'User {request.user.id} - ({request.user.email})/({request.user.username}) changed profile.')
+            profile_logger.info('User %s -  (%s)/ (%s) changed profile.', request.user.id, request.user.email, request.user.username)
             return Response(serializer.data, status=status.HTTP_200_OK)
+        profile_logger.warning('cahnge profile data failed. Data:  %s Errors: %s', request.data, serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
@@ -46,6 +54,9 @@ class ProfileView(APIView):
     )
     def get(self, request):
         serializer = ProfileUpdateSerializer(request.user, context={'request': request})
+
+        # profile_logger.info(f'User {request.user.id} - ({request.user.email})/({request.user.username}) see profile.')
+        profile_logger.info('User %s -  (%s)/ (%s) see profile.', request.user.id, request.user.email, request.user.username)
         return Response({
             'user_profile': serializer.data
         }, status=status.HTTP_200_OK)
