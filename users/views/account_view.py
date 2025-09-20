@@ -305,7 +305,7 @@ class ConfirmNewChangeNumber2FAView(APIView):
         serializer = ConfirmNewChangeNumber2FASerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
-            account_logger.info('User %s -  (%s)/ (%s) confirm new number of 2 FA and number changed.', request.user.id, request.user.email, request.user.username)
+            account_logger.info('User %s -  (%s)/ (%s) confirm new number of 2 FA and number.', request.user.id, request.user.email, request.user.username)
             return Response({
                 'message': 'mobile number changed successfully.',
             }, status=status.HTTP_200_OK)
