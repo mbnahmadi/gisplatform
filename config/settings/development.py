@@ -18,11 +18,6 @@ DATABASES = {
 
 # EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' خروجی ایمیل در کنسول
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # یا سرور ایمیل خودت
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'pmetoceans@gmail.com'
-EMAIL_HOST_PASSWORD = 'cvsz lvlj vtut brgx'
+
 
 
