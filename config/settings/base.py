@@ -55,7 +55,8 @@ INSTALLED_APPS = [
 
     #apps
     'users.apps.UsersConfig',
-    'notifications.apps.NotificationsConfig'
+    'chatboxapp.apps.ChatboxappConfig',
+    'notifications.apps.NotificationsConfig',
 ]
 
 # ----------------- logging -----------------------------
